@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\GENERAL\\teaching\\Videojocs\\2025-26-Q1\\Unity\\CubeRoller\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7DD276-2D76-737F-BB03-D671954E6EEE}|Assembly-CSharp.csproj|c:\\general\\teaching\\videojocs\\2025-26-q1\\unity\\cuberoller\\assets\\scripts\\movecube3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7DD276-2D76-737F-BB03-D671954E6EEE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\movecube3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7DD276-2D76-737F-BB03-D671954E6EEE}|Assembly-CSharp.csproj|C:\\GENERAL\\teaching\\Videojocs\\2025-26-Q1\\Unity\\CubeRoller\\assets\\scripts\\mapcreation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7DD276-2D76-737F-BB03-D671954E6EEE}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\mapcreation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MoveCube3.cs",
+              "DocumentMoniker": "C:\\GENERAL\\teaching\\Videojocs\\2025-26-Q1\\Unity\\CubeRoller\\Assets\\Scripts\\MoveCube3.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\MoveCube3.cs",
+              "ToolTip": "C:\\GENERAL\\teaching\\Videojocs\\2025-26-Q1\\Unity\\CubeRoller\\Assets\\Scripts\\MoveCube3.cs",
+              "RelativeToolTip": "Assets\\Scripts\\MoveCube3.cs",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAgwDgAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T14:36:36.791Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MapCreation.cs",
+              "DocumentMoniker": "C:\\GENERAL\\teaching\\Videojocs\\2025-26-Q1\\Unity\\CubeRoller\\Assets\\Scripts\\MapCreation.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\MapCreation.cs",
+              "ToolTip": "C:\\GENERAL\\teaching\\Videojocs\\2025-26-Q1\\Unity\\CubeRoller\\Assets\\Scripts\\MapCreation.cs",
+              "RelativeToolTip": "Assets\\Scripts\\MapCreation.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAQwCkAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T13:46:44.26Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
