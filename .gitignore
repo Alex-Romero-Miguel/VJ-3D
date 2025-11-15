@@ -1,0 +1,38 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# Visual Studio / Rider / VSCode
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.unityproj
+*.tmp
+UpgradeLog*.htm
+
+# Unity cache
+*.unitypackage
+*.meta~  
+*.lock
+*.DS_Store
+Sysinfo.txt
+
+# IDE cache files
+*.vcxproj*
+*.psess
+*.vsp
+*.vspx
+*.sdf
+*.opensdf
