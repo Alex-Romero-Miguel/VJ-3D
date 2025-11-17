@@ -20,6 +20,7 @@
 *.svd
 *.unityproj
 *.tmp
+*.dwlt
 
 # Unity cache
 *.unitypackage
