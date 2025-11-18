@@ -36,7 +36,21 @@ public class MoveCube : MonoBehaviour
     {
         RaycastHit hit;
 
-        return Physics.Raycast(transform.position, Vector3.down, out hit, size.y, layerMask);
+        if (isStanding()) return Physics.Raycast(transform.position, Vector3.down, out hit, size.y, layerMask);
+
+        Vector3 offset = Vector3.zero;
+
+        if (isLyingX())
+        {
+            offset = Vector3.right * halfSize.x;
+        }
+        else if (isLyingZ())
+        {
+            offset = Vector3.forward * halfSize.z;
+        }
+
+        return Physics.Raycast(transform.position + offset, Vector3.down, out hit, size.y, layerMask) && Physics.Raycast(transform.position - offset, Vector3.down, out hit, size.y, layerMask);
+
     }
 
     bool isStanding()
@@ -147,7 +161,9 @@ public class MoveCube : MonoBehaviour
                     rotPoint = transform.position + new Vector3(0.0f, -halfSize.y, -halfSize.z);
                     if (!isLyingX()) halfSize = new Vector3(halfSize.x, halfSize.z, halfSize.y);
                 }
+
                 size = 2*halfSize;
+
             }
         }
     }
