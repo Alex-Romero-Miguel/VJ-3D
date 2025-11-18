@@ -25,6 +25,8 @@ public class MoveCube : MonoBehaviour
 
     public AudioClip[] sounds; 		// Sounds to play when the cube rotates
     public AudioClip fallSound; 	// Sound to play when the cube starts falling
+
+    Vector3 size, halfSize;
 	
 	
 	// Determine if the cube is grounded by shooting a ray down from the cube location and 
@@ -33,10 +35,23 @@ public class MoveCube : MonoBehaviour
     bool isGrounded()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.0f, layerMask))
-            return true;
 
-        return false;
+        return Physics.Raycast(transform.position, Vector3.down, out hit, size.y, layerMask);
+    }
+
+    bool isStanding()
+    {
+        return transform.up == Vector3.up || transform.up == Vector3.down;
+    }
+
+    bool isLyingX()
+    {
+        return transform.up == Vector3.right || transform.up == Vector3.left;
+    }
+
+    bool isLyingZ()
+    {
+        return transform.up == Vector3.forward || transform.up == Vector3.back;
     }
 
     // Start is called once after the MonoBehaviour is created
@@ -47,6 +62,10 @@ public class MoveCube : MonoBehaviour
 		
 		// Create the layer mask for ground tiles. Done once in the Start method to avoid doing it every Update call.
         layerMask = LayerMask.GetMask("Ground");
+
+        BoxCollider box = GetComponent<BoxCollider>();
+        size = box.bounds.size;
+        halfSize = box.bounds.extents; 
     }
 
     // Update is called once per frame
@@ -97,35 +116,39 @@ public class MoveCube : MonoBehaviour
 				
 				// Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
                 if (dir.x > 0.99)
-                {
+                {   // right
                     rotDir = -1.0f;
                     rotRemainder = 90.0f;
-                    rotAxis = new Vector3(0.0f, 0.0f, 1.0f);
-                    rotPoint = transform.position + new Vector3(0.5f, -0.5f, 0.0f);
+                    rotAxis = Vector3.forward;
+                    rotPoint = transform.position + new Vector3(halfSize.x, -halfSize.y, 0.0f);
+                    if (!isLyingZ()) halfSize = new Vector3(halfSize.y, halfSize.x, halfSize.z);
                 }
-                else if (dir.x < -0.99)
-                {
+                else if (dir.x < -0.99) 
+                {   // left
                     rotDir = 1.0f;
                     rotRemainder = 90.0f;
-                    rotAxis = new Vector3(0.0f, 0.0f, 1.0f);
-                    rotPoint = transform.position + new Vector3(-0.5f, -0.5f, 0.0f);
+                    rotAxis = Vector3.forward;
+                    rotPoint = transform.position + new Vector3(-halfSize.x, -halfSize.y, 0.0f);
+                    if (!isLyingZ()) halfSize = new Vector3(halfSize.y, halfSize.x, halfSize.z);
                 }
-                else if (dir.y > 0.99)
-                {
+                else if (dir.y > 0.99)  
+                {   // forward
                     rotDir = 1.0f;
                     rotRemainder = 90.0f;
-                    rotAxis = new Vector3(1.0f, 0.0f, 0.0f);
-                    rotPoint = transform.position + new Vector3(0.0f, -0.5f, 0.5f);
+                    rotAxis = Vector3.right;
+                    rotPoint = transform.position + new Vector3(0.0f, -halfSize.y, halfSize.z);
+                    if (!isLyingX()) halfSize = new Vector3(halfSize.x, halfSize.z, halfSize.y);
                 }
-                else if (dir.y < -0.99)
-                {
+                else if (dir.y < -0.99) 
+                {   // back
                     rotDir = -1.0f;
                     rotRemainder = 90.0f;
-                    rotAxis = new Vector3(1.0f, 0.0f, 0.0f);
-                    rotPoint = transform.position + new Vector3(0.0f, -0.5f, -0.5f);
+                    rotAxis = Vector3.right;
+                    rotPoint = transform.position + new Vector3(0.0f, -halfSize.y, -halfSize.z);
+                    if (!isLyingX()) halfSize = new Vector3(halfSize.x, halfSize.z, halfSize.y);
                 }
+                size = 2*halfSize;
             }
         }
     }
-
 }
