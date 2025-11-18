@@ -55,17 +55,17 @@ public class MoveCube : MonoBehaviour
 
     bool isStanding()
     {
-        return transform.up == Vector3.up || transform.up == Vector3.down;
+        return halfSize.x == halfSize.z;
     }
 
     bool isLyingX()
     {
-        return transform.up == Vector3.right || transform.up == Vector3.left;
+        return halfSize.y == halfSize.z;
     }
 
     bool isLyingZ()
     {
-        return transform.up == Vector3.forward || transform.up == Vector3.back;
+        return halfSize.x == halfSize.y;
     }
 
     // Start is called once after the MonoBehaviour is created
