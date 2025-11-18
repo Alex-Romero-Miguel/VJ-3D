@@ -40,17 +40,10 @@ public class MoveCube : MonoBehaviour
 
         Vector3 offset = Vector3.zero;
 
-        if (isLyingX())
-        {
-            offset = Vector3.right * halfSize.x;
-        }
-        else if (isLyingZ())
-        {
-            offset = Vector3.forward * halfSize.z;
-        }
-
+        if (isLyingX()) offset = Vector3.right * halfSize.x / 2;
+        else if (isLyingZ()) offset = Vector3.forward * halfSize.z / 2;
+        
         return Physics.Raycast(transform.position + offset, Vector3.down, out hit, size.y, layerMask) && Physics.Raycast(transform.position - offset, Vector3.down, out hit, size.y, layerMask);
-
     }
 
     bool isStanding()
