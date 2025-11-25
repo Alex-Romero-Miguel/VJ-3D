@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
+using System.Collections;
 
 
 // MoveCube manages cube movement. WASD + Cursor keys rotate the cube in the
@@ -46,7 +48,7 @@ public class MoveCube : MonoBehaviour
         return Physics.Raycast(transform.position + offset, Vector3.down, out hit, size.y, layerMask) && Physics.Raycast(transform.position - offset, Vector3.down, out hit, size.y, layerMask);
     }
 
-    bool isStanding()
+    public bool isStanding()
     {
         return halfSize.x == halfSize.z;
     }
@@ -60,6 +62,34 @@ public class MoveCube : MonoBehaviour
     {
         return halfSize.x == halfSize.y;
     }
+
+    public void startGoalFalling()
+    {
+        bFalling = false;
+
+        StartCoroutine(GoalFallAnimation());
+    }
+
+    private IEnumerator GoalFallAnimation()
+    {
+        while (bMoving)
+            yield return null;
+
+        float duration = 0.8f;
+        Vector3 start = transform.position;
+        Vector3 end = transform.position + Vector3.down * 3f;
+
+        float t = 0;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            transform.position = Vector3.Lerp(start, end, t / duration);
+            yield return null;
+        }
+
+        LevelManager.Instance.LoadNextLevel();
+    }
+
 
     // Start is called once after the MonoBehaviour is created
     void Start()
