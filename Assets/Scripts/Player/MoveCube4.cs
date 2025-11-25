@@ -12,29 +12,27 @@ using System.Collections;
 
 public class MoveCube : MonoBehaviour
 {
-    InputAction moveAction; 		// Input action to capture player movement (WASD + cursor keys)
-
-    bool bMoving = false; 			// Is the object in the middle of moving?
-	bool bFalling = false; 			// Is the object falling?
-    
 	public float rotSpeed; 			// Rotation speed in degrees per second
     public float fallSpeed; 		// Fall speed in the Y direction
-
-    Vector3 rotPoint, rotAxis; 		// Rotation movement is performed around the line formed by rotPoint and rotAxis
-	float rotRemainder; 			// The angle that the cube still has to rotate before the current movement is completed
-    float rotDir; 					// Has rotRemainder to be applied in the positive or negative direction?
-    LayerMask layerMask; 			// LayerMask to detect raycast hits with ground tiles only
-
-    public AudioClip[] sounds; 		// Sounds to play when the cube rotates
     public AudioClip fallSound; 	// Sound to play when the cube starts falling
+    public AudioClip[] moveSounds; 		// Sounds to play when the cube rotates
 
-    Vector3 size, halfSize;
+    private bool bMoving = false; 			// Is the object in the middle of moving?
+	private bool bFalling = false; 			// Is the object falling?
+	private float rotRemainder; 			// The angle that the cube still has to rotate before the current movement is completed
+    private float rotDir; 					// Has rotRemainder to be applied in the positive or negative direction?
+    private Vector3 initPos, initSize; 		// Initial position and size of the cube
+    private Quaternion initRot; 	        // Initial rotation of the cube
+    private Vector3 rotPoint, rotAxis; 		// Rotation movement is performed around the line formed by rotPoint and rotAxis
+    private InputAction moveAction; 		// Input action to capture player movement (WASD + cursor keys)
+    private LayerMask layerMask; 			// LayerMask to detect raycast hits with ground tiles only
+    private Vector3 size, halfSize;
 	
 	
 	// Determine if the cube is grounded by shooting a ray down from the cube location and 
 	// looking for hits with ground tiles
 
-    bool isGrounded()
+    private bool isGrounded()
     {
         RaycastHit hit;
 
@@ -53,14 +51,23 @@ public class MoveCube : MonoBehaviour
         return halfSize.x == halfSize.z;
     }
 
-    bool isLyingX()
+    public bool isLyingX()
     {
         return halfSize.y == halfSize.z;
     }
 
-    bool isLyingZ()
+    public bool isLyingZ()
     {
         return halfSize.x == halfSize.y;
+    }
+
+    private void Awake()
+    {
+        initPos = transform.position;
+        initRot = transform.rotation;
+
+        BoxCollider box = GetComponent<BoxCollider>();
+        initSize = box.bounds.size;
     }
 
     public void startGoalFalling()
@@ -92,7 +99,7 @@ public class MoveCube : MonoBehaviour
 
 
     // Start is called once after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
 		// Find the move action by name. Done once in the Start method to avoid doing it every Update call.
         moveAction = InputSystem.actions.FindAction("Move");
@@ -100,13 +107,12 @@ public class MoveCube : MonoBehaviour
 		// Create the layer mask for ground tiles. Done once in the Start method to avoid doing it every Update call.
         layerMask = LayerMask.GetMask("Ground");
 
-        BoxCollider box = GetComponent<BoxCollider>();
-        size = box.bounds.size;
-        halfSize = box.bounds.extents; 
+        size = initSize;
+        halfSize = initSize/2.0f; 
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if(bFalling)
         {
@@ -148,8 +154,8 @@ public class MoveCube : MonoBehaviour
                 bMoving = true;
 				
 				// We play a random movemnt sound
-                int iSound = UnityEngine.Random.Range(0, sounds.Length);
-                AudioSource.PlayClipAtPoint(sounds[iSound], transform.position, 1.0f);
+                int iSound = UnityEngine.Random.Range(0, moveSounds.Length);
+                AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
 				
 				// Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
                 if (dir.x > 0.99)
@@ -189,5 +195,22 @@ public class MoveCube : MonoBehaviour
 
             }
         }
+    }
+
+    public void Reset()
+    {       
+        transform.rotation = initRot;
+        transform.position = initPos;
+
+        size = initSize;
+        halfSize = initSize/2.0f;
+
+        bFalling = false;
+        bMoving = false;
+    }
+
+    public bool isMoving()
+    {
+        return bMoving;
     }
 }
