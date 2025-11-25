@@ -94,7 +94,7 @@ public class MoveCube : MonoBehaviour
             yield return null;
         }
 
-        LevelManager.Instance.LoadNextLevel();
+        LevelManager.Instance.CompleteLevel();
     }
 
 

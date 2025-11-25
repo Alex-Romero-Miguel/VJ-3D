@@ -455,6 +455,7 @@ GameObject:
   - component: {fileID: 5396099828374307098}
   - component: {fileID: 6049853216151530292}
   - component: {fileID: 4810150081213654530}
+  - component: {fileID: 5644055627304103674}
   m_Layer: 3
   m_Name: GoalTile
   m_TagString: Untagged
@@ -514,3 +515,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db994390baa6edd46b700961a12d53fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalTile
+--- !u!114 &5644055627304103674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7761140359684795549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3024fc1a6604d2846863a4768af89a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TileAnimator
