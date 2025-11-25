@@ -11,6 +11,11 @@ public class MapCreation : MonoBehaviour
     public TextAsset map; 		// Text file containing the map
     public GameObject tile; 	// Tile prefab used to instance and build the level
 
+    public GameObject goalTile;
+    public GameObject fragileTile;
+
+
+
     // Start is called once after the MonoBehaviour is created
     void Start()
     {
@@ -35,15 +40,51 @@ public class MapCreation : MonoBehaviour
         for(int z=0; z<sizeZ; z++)
             for(int x=0; x<sizeX; x++)
             {
-                if (nums[z * sizeX + x + 2] == 2)
+                int tileId = nums[z * sizeX + x + 2];
+
+                GameObject prefab = null;
+
+                switch (tileId)
                 {
-                    // Instantiate the copy at its corresponding location
-                    //Instantiate(tile, new Vector3(x, 0.0f, z), transform.rotation);
-                    GameObject obj = Instantiate(tile, new Vector3(x, -0.05f, z), transform.rotation);
-					
-					// Set the new object parent to be the game object containing this script
+                    case 2:
+                        prefab = tile;
+                        break;
+                    case 3:
+                        prefab = goalTile;
+                        break;
+                    case 4:
+                        prefab = fragileTile;
+                        break;
+                    case 5:
+                        //prefab = roundBottonTile;
+                        break;
+                    case 6:
+                        //prefab = crossBottonTile;
+                        break;
+                    default:
+                        break;
+
+                }
+
+                if (prefab != null)
+                {
+                    GameObject obj = Instantiate(prefab, new Vector3(x, -0.05f, z), Quaternion.identity);
                     obj.transform.parent = transform;
                 }
+
+
+                //           if (nums[z * sizeX + x + 2] == 2)
+                //           {
+                //               // Instantiate the copy at its corresponding location
+                //               //Instantiate(tile, new Vector3(x, 0.0f, z), transform.rotation);
+                //               GameObject obj = Instantiate(tile, new Vector3(x, -0.05f, z), transform.rotation);
+
+                //// Set the new object parent to be the game object containing this script
+                //               obj.transform.parent = transform;
+                //           }
+
+
+
             }
     }
 
