@@ -123,7 +123,7 @@ public class LevelManager : MonoBehaviour
         if(transitioning) yield break;
         playerReference.SetActive(false);
 
-        yield return StartCoroutine(SpiralAnimation());
+        yield return StartCoroutine(FallAnimation());
         UnloadLevel();
 
         yield return new WaitForSeconds(levelAnimationDelay);
