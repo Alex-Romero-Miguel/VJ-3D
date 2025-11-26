@@ -27,6 +27,7 @@ public class MoveCube : MonoBehaviour
     private InputAction moveAction; 		// Input action to capture player movement (WASD + cursor keys)
     private LayerMask layerMask; 			// LayerMask to detect raycast hits with ground tiles only
     private Vector3 size, halfSize;
+    private LevelManager levelManager;
 	
 	
 	// Determine if the cube is grounded by shooting a ray down from the cube location and 
@@ -70,34 +71,6 @@ public class MoveCube : MonoBehaviour
         initSize = box.bounds.size;
     }
 
-    public void startGoalFalling()
-    {
-        bFalling = false;
-
-        StartCoroutine(GoalFallAnimation());
-    }
-
-    private IEnumerator GoalFallAnimation()
-    {
-        while (bMoving)
-            yield return null;
-
-        float duration = 0.8f;
-        Vector3 start = transform.position;
-        Vector3 end = transform.position + Vector3.down * 3f;
-
-        float t = 0;
-        while (t < duration)
-        {
-            t += Time.deltaTime;
-            transform.position = Vector3.Lerp(start, end, t / duration);
-            yield return null;
-        }
-
-        LevelManager.Instance.CompleteLevel();
-    }
-
-
     // Start is called once after the MonoBehaviour is created
     private void Start()
     {
@@ -106,6 +79,8 @@ public class MoveCube : MonoBehaviour
 		
 		// Create the layer mask for ground tiles. Done once in the Start method to avoid doing it every Update call.
         layerMask = LayerMask.GetMask("Ground");
+
+        levelManager = LevelManager.Instance;
 
         size = initSize;
         halfSize = initSize/2.0f; 
@@ -212,5 +187,21 @@ public class MoveCube : MonoBehaviour
     public bool isMoving()
     {
         return bMoving;
+    }
+
+    public IEnumerator AnimateFall(float duration = 0.8f)
+    {
+        yield return new WaitUntil(() => !bMoving);
+
+        Vector3 start = transform.position;
+        Vector3 end = transform.position + Vector3.down * 3f;
+
+        float t = 0;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            transform.position = Vector3.Lerp(start, end, t / duration);
+            yield return null;
+        }
     }
 }

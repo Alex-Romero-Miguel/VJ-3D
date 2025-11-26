@@ -69,7 +69,7 @@ public class LevelManager : MonoBehaviour
         if(transitioning) yield break;
 
         LoadLevel(currentLevel);
-        yield return StartCoroutine(RiseAnimation());
+        yield return StartCoroutine(MapRiseAnimation());
 
         playerReference.SetActive(true);
         player.Reset();
@@ -81,25 +81,32 @@ public class LevelManager : MonoBehaviour
         if(transitioning) yield break;
         playerReference.SetActive(false);
 
-        yield return StartCoroutine(FallAnimation());
+        yield return StartCoroutine(MapFallAnimation());
 
         yield return new WaitForSeconds(levelAnimationDelay);
 
         if(transitioning) yield break;
-        yield return StartCoroutine(RiseAnimation());
+        yield return StartCoroutine(MapRiseAnimation());
 
         playerReference.SetActive(true);
         player.Reset();
     }
 
+    public void CompleteLevel()
+    {
+        StartCoroutine(NextLevel());
+    }
+
     // Completa el nivel con animación en espiral y destruye el mapa
-    public IEnumerator CompleteLevel()
+    private IEnumerator NextLevel()
     {
         if(transitioning) yield break;
+
+        yield return StartCoroutine(PlayerFallAnimation());
         playerReference.SetActive(false);
 
         // Animación de victoria
-        yield return StartCoroutine(SpiralAnimation());
+        yield return StartCoroutine(MapSpiralAnimation());
         UnloadLevel();
         
         yield return new WaitForSeconds(levelAnimationDelay);
@@ -123,7 +130,7 @@ public class LevelManager : MonoBehaviour
         if(transitioning) yield break;
         playerReference.SetActive(false);
 
-        yield return StartCoroutine(FallAnimation());
+        yield return StartCoroutine(MapFallAnimation());
         UnloadLevel();
 
         yield return new WaitForSeconds(levelAnimationDelay);
@@ -174,7 +181,7 @@ public class LevelManager : MonoBehaviour
         animationsRunning--;
     }
 
-    private IEnumerator RiseAnimation()
+    private IEnumerator MapRiseAnimation()
     {
         transitioning = true;
 
@@ -203,7 +210,7 @@ public class LevelManager : MonoBehaviour
         transitioning = false;
     }
 
-    private IEnumerator FallAnimation()
+    private IEnumerator MapFallAnimation()
     {
         transitioning = true;
 
@@ -232,7 +239,7 @@ public class LevelManager : MonoBehaviour
         transitioning = false;
     }
 
-    private IEnumerator SpiralAnimation()
+    private IEnumerator MapSpiralAnimation()
     {
         transitioning = true;
 
@@ -272,5 +279,12 @@ public class LevelManager : MonoBehaviour
             int k = rng.Next(n + 1);
             (list[k], list[n]) = (list[n], list[k]);
         }
+    }
+
+    private IEnumerator PlayerFallAnimation()
+    {
+        transitioning = true;
+        yield return StartCoroutine(player.AnimateFall());
+        transitioning = false;
     }
 }

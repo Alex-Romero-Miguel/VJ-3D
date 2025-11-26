@@ -3,6 +3,12 @@ using System.Collections;
 
 public class GoalTile : TileBase
 {
+    private LevelManager levelManager;
+
+    private void Start()
+    {
+        levelManager = LevelManager.Instance;
+    }
 
     protected override void Activate(Collider other)
     {
@@ -13,11 +19,11 @@ public class GoalTile : TileBase
             if (cube != null && cube.isStanding())
             {
                 //Debug.Log("VICTORIA");
-                cube.startGoalFalling();
+                levelManager.CompleteLevel();
             }
             //else
             //{
-            //    Debug.Log("Estás en la meta, pero TUMBADO. ¡Ponte de pie!");
+            //    Debug.Log("EstÃ¡s en la meta, pero TUMBADO. Â¡Ponte de pie!");
             //}
         }
     }
