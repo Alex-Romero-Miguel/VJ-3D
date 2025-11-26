@@ -485,7 +485,7 @@ Transform:
   m_GameObject: {fileID: 1402451728}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 1, z: 5}
+  m_LocalPosition: {x: 3, y: 1, z: 9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -506,7 +506,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MoveCube
   rotSpeed: 240
   fallSpeed: 7
-  goalFallDuration: 0.8
   fallSound: {fileID: 8300000, guid: 6bdc6de39c0314b4eb1b1ab0e21ad992, type: 3}
   moveSounds:
   - {fileID: 8300000, guid: 136a39088874395408d09223710c4f72, type: 3}

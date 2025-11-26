@@ -52,6 +52,7 @@ public class MapCreator : MonoBehaviour
             mapRoot.transform.parent = parent;
 
         int index = 2;
+        int sizeZminus1 = sizeZ - 1;
         for (int z = 0; z < sizeZ; z++)
         {
             for (int x = 0; x < sizeX; x++)
@@ -70,7 +71,7 @@ public class MapCreator : MonoBehaviour
                 GameObject prefab = tileTypes[tileId-1];
                 if (prefab == null) continue;
 
-                Vector3 pos = origin + new Vector3(x, 0f, z);
+                Vector3 pos = origin + new Vector3(x, 0f, sizeZminus1 - z);
                 GameObject tile = Instantiate(prefab, pos, Quaternion.identity);
                 tile.transform.parent = mapRoot.transform;
                 
