@@ -73,7 +73,6 @@ public class MoveCube : MonoBehaviour
     public void startGoalFalling()
     {
         bFalling = false;
-
         StartCoroutine(GoalFallAnimation());
     }
 
@@ -118,6 +117,12 @@ public class MoveCube : MonoBehaviour
         {
 			// If we have fallen, we just move down
             transform.Translate(Vector3.down * fallSpeed * Time.deltaTime, Space.World);
+
+            if (transform.position.y < -10f)
+            {
+                this.enabled = false;
+                LevelManager.Instance.StartCoroutine(LevelManager.Instance.RestartLevel());
+            }
         }
         else if (bMoving)
         {

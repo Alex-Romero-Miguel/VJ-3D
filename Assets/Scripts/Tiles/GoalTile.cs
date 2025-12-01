@@ -14,6 +14,7 @@ public class GoalTile : TileBase
             {
                 //Debug.Log("VICTORIA");
                 cube.startGoalFalling();
+                //StartCoroutine(LevelManager.Instance.CompleteLevel());
             }
             //else
             //{
