@@ -258,6 +258,9 @@ MonoBehaviour:
   - {fileID: 7761140359684795549, guid: f8fd0d93878f1644ba84fc95bbf549c7, type: 3}
   - {fileID: 7761140359684795549, guid: befc56b1b238a8c4bb8302211a904f8d, type: 3}
   - {fileID: 7761140359684795549, guid: 2a2c478607c1df44c8cdab0e222b4489, type: 3}
+  - {fileID: 7761140359684795549, guid: cae5ee2d66f5a194dbe56f23651dc4ec, type: 3}
+  - {fileID: 7761140359684795549, guid: 81ee00f5b86e48e459bd37a0956a0c87, type: 3}
+  - {fileID: 7761140359684795549, guid: f6a955cb1b0d7ce46b0b092a67dbca43, type: 3}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -997,6 +1000,33 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c923576bf7726b74583bd6175683b7af, type: 3}
   - {fileID: 8300000, guid: 6588f78fcb7456f4ab7840b863429068, type: 3}
   - {fileID: 8300000, guid: 6ac4dc07db529eb4fb121643c48573ea, type: 3}
+--- !u!54 &1402451734
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402451728}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1497315620
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,6 +23,42 @@ public class MapCreator : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private class ParsedTile
+    {
+        public int id;        // ID del prefab (1–n)
+        public int canal_id;   // variant opcional (0–n)
+        public string extra;  // text opcional ("L", "R", etc.)
+    }
+
+    private ParsedTile ParseToken(string token)
+    {
+        // Formats suportats:
+        // "3"
+        // "4:0"
+        // "6:1:L"
+
+        ParsedTile pt = new ParsedTile();
+
+        string[] p = token.Split(':');
+
+        // ID
+        pt.id = int.Parse(p[0]);
+
+        // Variant opcional
+        if (p.Length > 1)
+            pt.canal_id = int.Parse(p[1]);
+        else
+            pt.canal_id = 0;
+
+        // Extra opcional
+        if (p.Length > 2)
+            pt.extra = p[2];
+        else
+            pt.extra = null;
+
+        return pt;
+    }
+
     public List<GameObject> CreateMap(TextAsset mapFile, Vector3 origin, Transform parent = null)
     {
         // Si ya había un mapa creado → destruirlo
@@ -36,15 +72,18 @@ public class MapCreator : MonoBehaviour
             return null;
         }
 
-        char[] seps = { ' ', '\n', '\r' };
-        string[] snums = mapFile.text.Split(seps, StringSplitOptions.RemoveEmptyEntries);
+        char[] seps = { ' ', '\n', '\r', '\t' };
+        string[] tokens = mapFile.text.Split(seps, StringSplitOptions.RemoveEmptyEntries);
 
-        int[] nums = new int[snums.Length];
-        for (int i = 0; i < snums.Length; i++)
-            nums[i] = int.Parse(snums[i]);
+        if (tokens.Length < 2)
+        {
+            Debug.LogError("MapCreator: archivo no válido.");
+            return null;
+        }
 
-        int sizeX = nums[0];
-        int sizeZ = nums[1];
+        // Llegim les dimensions
+        int sizeX = int.Parse(tokens[0]);
+        int sizeZ = int.Parse(tokens[1]);
 
         // Crear raíz del mapa
         mapRoot = new GameObject("Map_" + mapFile.name);
@@ -57,24 +96,36 @@ public class MapCreator : MonoBehaviour
         {
             for (int x = 0; x < sizeX; x++)
             {
-                int tileId = nums[index++];
-
-                if (tileId == 0)
-                    continue; // espacio vacío
-
-                if (tileId < 1 || tileId > tileTypes.Length)
+                if (index >= tokens.Length)
                 {
-                    Debug.LogWarning($"MapCreator: tileId {tileId} fuera de rango.");
+                    Debug.LogWarning("Mapa incompleto o mal formateado.");
+                    break;
+                }
+
+                string token = tokens[index++];
+
+                if (token == "0")
+                    continue;
+
+                ParsedTile parsed = ParseToken(token);
+
+                if (parsed.id < 1 || parsed.id > tileTypes.Length)
+                {
+                    Debug.LogWarning($"ID {parsed.id} fuera de rango. Token: {token}");
                     continue;
                 }
 
-                GameObject prefab = tileTypes[tileId-1];
+                GameObject prefab = tileTypes[parsed.id - 1];
                 if (prefab == null) continue;
 
                 Vector3 pos = origin + new Vector3(x, 0f, sizeZminus1 - z);
-                GameObject tile = Instantiate(prefab, pos, Quaternion.identity);
-                tile.transform.parent = mapRoot.transform;
-                
+                GameObject tile = Instantiate(prefab, pos, Quaternion.identity, mapRoot.transform);
+
+                // Si el tile té configuració
+                ITileConfigurable cfg = tile.GetComponent<ITileConfigurable>();
+                if (cfg != null)
+                    cfg.Configure(parsed.canal_id, parsed.extra);
+
                 spawnedTiles.Add(tile);
             }
         }
