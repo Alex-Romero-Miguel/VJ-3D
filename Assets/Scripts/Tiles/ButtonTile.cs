@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class ButtonTile : TileBase
+public class ButtonTile : TileBase, ITileConfigurable
 {
     // Marca esto como TRUE solo en el prefab del botón Cruz (Strict)
     public bool isStrictButton;
@@ -11,7 +11,7 @@ public class ButtonTile : TileBase
     private List<BridgeTile> connectedBridges = new List<BridgeTile>();
 
     // Esta función la llama MapCreator al crear el mapa
-    public void Configure(int id)
+    public void Configure(int id, string extra)
     {
         this.channelID = id;
     }
