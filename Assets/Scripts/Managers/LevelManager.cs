@@ -98,6 +98,11 @@ public class LevelManager : MonoBehaviour
         player.Reset();
     }
 
+    public void Restart()
+    {
+        StartCoroutine(RestartLevel());
+    }
+
     public void CompleteLevel()
     {
         StartCoroutine(NextLevel());

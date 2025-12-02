@@ -96,8 +96,7 @@ public class MoveCube : MonoBehaviour
 
             if (transform.position.y < -10f)
             {
-                this.enabled = false;
-                LevelManager.Instance.StartCoroutine(LevelManager.Instance.RestartLevel());
+                levelManager.Restart();
             }
         }
         else if (bMoving)
@@ -193,6 +192,11 @@ public class MoveCube : MonoBehaviour
     public bool isMoving()
     {
         return bMoving;
+    }
+
+    public void Divide()
+    {
+        // TODO: Implement
     }
 
     public IEnumerator AnimateFall(float duration = 0.8f)
