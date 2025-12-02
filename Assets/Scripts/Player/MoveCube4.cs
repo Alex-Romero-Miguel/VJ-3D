@@ -197,6 +197,7 @@ public class MoveCube : MonoBehaviour
     public void Divide()
     {
         // TODO: Implement
+        Debug.Log("Divided");
     }
 
     public IEnumerator AnimateFall(float duration = 0.8f)
