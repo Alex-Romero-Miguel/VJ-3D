@@ -1035,6 +1035,7 @@ MonoBehaviour:
   maps:
   - {fileID: 4900000, guid: 47cce3596cafe4d4a8fa5951cdd380a0, type: 3}
   - {fileID: 4900000, guid: fda1f469f670d2041baaf65bbbf023d8, type: 3}
+  - {fileID: 4900000, guid: b5309a438bd22624ca673e05595b92f1, type: 3}
 --- !u!4 &1497315622
 Transform:
   m_ObjectHideFlags: 0
