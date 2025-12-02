@@ -17,6 +17,7 @@ public class LevelManager : MonoBehaviour
     private int currentLevel;
     private int animationsRunning;
     private MapCreator mapCreator;
+    private MenuManager menuManager;
     private MoveCube player;
     private InputAction numberAction;
     private List<GameObject> tiles;
@@ -40,12 +41,12 @@ public class LevelManager : MonoBehaviour
         animationsRunning = 0;
         tiles = new List<GameObject>();
         mapCreator = MapCreator.Instance;
+        menuManager = MenuManager.Instance;
         player = playerReference.GetComponent<MoveCube>();
 
         transitioning = false;
         currentLevel = 0;
         playerReference.SetActive(false);
-        StartCoroutine(StartLevel());
     }
 
     // Atajo: teclas numéricas para saltar niveles (del 1 al 9, y el 0 como el 10)
@@ -61,6 +62,11 @@ public class LevelManager : MonoBehaviour
             if (targetLevel == currentLevel) StartCoroutine(RestartLevel());
             else StartCoroutine(ChangeLevel(targetLevel));
         }
+    }
+
+    public void BeginGame() 
+    {
+        StartCoroutine(StartLevel());
     }
 
     // Inicia el nivel actual
@@ -120,6 +126,7 @@ public class LevelManager : MonoBehaviour
         else
         {
             // Terminar juego
+            currentLevel = 0;
             yield return StartCoroutine(CompleteGame());
         }
     }
@@ -168,9 +175,11 @@ public class LevelManager : MonoBehaviour
     // Función de marcador para el final del juego
     private IEnumerator CompleteGame()
     {
-        // Aquí aparecerán créditos y luego volverá al menú principal
-        // TODO: Implementación pendiente
-        yield break;
+        if (transitioning) yield break;
+
+        yield return StartCoroutine(menuManager.RunCredits());
+
+        menuManager.GoToMainMenu();
     }
 
     // Wrapper que incrementa el contador, ejecuta la corutina y lo decrementa al terminar
