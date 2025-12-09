@@ -113,7 +113,7 @@ public class LevelManager : MonoBehaviour
     {
         if(transitioning) yield break;
 
-        yield return StartCoroutine(PlayerFallAnimation());
+        yield return StartCoroutine(PlayerSlideAnimation());
         playerReference.SetActive(false);
 
         // Animación de victoria
@@ -295,10 +295,10 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayerFallAnimation()
+    private IEnumerator PlayerSlideAnimation()
     {
         transitioning = true;
-        yield return StartCoroutine(player.AnimateFall());
+        yield return StartCoroutine(player.AnimateSlide());
         transitioning = false;
     }
 }

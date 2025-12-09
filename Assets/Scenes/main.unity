@@ -1329,7 +1329,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveCube
   rotSpeed: 240
-  fallSpeed: 7
+  fallAcceleration: 7
   fallSound: {fileID: 8300000, guid: 6bdc6de39c0314b4eb1b1ab0e21ad992, type: 3}
   moveSounds:
   - {fileID: 8300000, guid: 136a39088874395408d09223710c4f72, type: 3}
