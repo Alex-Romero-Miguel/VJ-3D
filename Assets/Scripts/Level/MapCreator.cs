@@ -30,35 +30,6 @@ public class MapCreator : MonoBehaviour
         public string extra;  // text opcional ("L", "R", etc.)
     }
 
-    private ParsedTile ParseToken(string token)
-    {
-        // Formats suportats:
-        // "3"
-        // "4:0"
-        // "6:1:L"
-
-        ParsedTile pt = new ParsedTile();
-
-        string[] p = token.Split(':');
-
-        // ID
-        pt.id = int.Parse(p[0]);
-
-        // Variant opcional
-        if (p.Length > 1)
-            pt.canal_id = int.Parse(p[1]);
-        else
-            pt.canal_id = 0;
-
-        // Extra opcional
-        if (p.Length > 2)
-            pt.extra = p[2];
-        else
-            pt.extra = null;
-
-        return pt;
-    }
-
     public List<GameObject> CreateMap(TextAsset mapFile, Vector3 origin, Transform parent = null)
     {
         // Si ya había un mapa creado → destruirlo
@@ -126,6 +97,25 @@ public class MapCreator : MonoBehaviour
                 if (cfg != null)
                     cfg.Configure(parsed.canal_id, parsed.extra);
 
+                // si es un boton split
+                SplitButton splitBtn = tile.GetComponent<SplitButton>();
+                if (splitBtn != null)
+                {
+                    int[] p = Array.ConvertAll(parsed.extra.Split(','), int.Parse);
+
+                    //Vector3 localPosA = new Vector3(p[1], 0.1f, sizeZminus1 - p[0]);
+                    //Vector3 posA = mapRoot.transform.TransformPoint(localPosA);
+
+                    //Vector3 localPosB = new Vector3(p[3], 0.1f, sizeZminus1 - p[2]);
+                    //Vector3 posB = mapRoot.transform.TransformPoint(localPosB);
+
+                    Vector3 posA = origin + new Vector3(p[1], 0f, sizeZminus1 - p[0]);
+                    Vector3 posB = origin + new Vector3(p[3], 0f, sizeZminus1 - p[2]);
+
+                    splitBtn.SetSplitPositions(posA, posB);
+                }
+
+
                 spawnedTiles.Add(tile);
             }
         }
@@ -152,5 +142,49 @@ public class MapCreator : MonoBehaviour
             var ta = t.GetComponent<TileAnimator>();
             if (ta != null) ta.StopAllCoroutines();
         }
+    }
+
+    private ParsedTile ParseToken(string token)
+    {
+        // Formats suportats:
+        // "3"
+        // "4:0"  puente
+        // "6:1:L" boton puente
+        // "7:2,1,3,1"  boton split
+
+        ParsedTile pt = new ParsedTile();
+
+        string[] p = token.Split(':');
+
+        pt.id = int.Parse(p[0]);
+        pt.canal_id = 0;
+        pt.extra = null;
+
+        //// Variant opcional
+        //if (p.Length > 1)
+        //    pt.canal_id = int.Parse(p[1]);
+
+        //// Extra opcional
+        //if (p.Length > 2)
+        //    pt.extra = p[2];
+
+        if (p.Length > 1)
+        {
+            bool isChannelNumber = int.TryParse(p[1], out int cId);
+
+            if (isChannelNumber)
+            {
+                pt.canal_id = cId;
+                if (p.Length > 2)
+                    pt.extra = pt.extra = p[2];
+            }
+            else
+            {
+                pt.extra = p[1];
+            }
+        }
+
+
+        return pt;
     }
 }

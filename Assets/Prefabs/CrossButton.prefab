@@ -247,11 +247,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7761140359684795549}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627fc209e20bdff4885abeb433e0f40d, type: 3}
+  m_Script: {fileID: 11500000, guid: b2cfc16c962775748babc2539d41c75d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonTile
   isStrictButton: 1
-  channelID: 1
+  channelID: 0
 --- !u!54 &1565322092190942194
 Rigidbody:
   m_ObjectHideFlags: 0
