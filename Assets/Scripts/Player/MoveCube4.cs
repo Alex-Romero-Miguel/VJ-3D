@@ -45,7 +45,7 @@ public class MoveCube : MonoBehaviour
     private bool isGrounded()
     {
         RaycastHit hit;
-
+        
         if (isStanding()) return Physics.Raycast(currentBox.bounds.center, Vector3.down, out hit, size.y, layerMask);
 
         Vector3 offset = Vector3.zero;
@@ -65,7 +65,7 @@ public class MoveCube : MonoBehaviour
         Vector3 offset = Vector3.zero;
         bool plus = false;
         bool minus = false;
-
+        
         if (isLyingX()) 
         {
             offset = Vector3.right * halfSize.x / 2;
@@ -124,13 +124,13 @@ public class MoveCube : MonoBehaviour
         fullInitSize = fullBox.bounds.size;
 
         topHalfTransform = transforms[1];
-        topHalfInitPos = topHalfTransform.position;
+        topHalfInitPos = topHalfTransform.localPosition;
         topHalfInitRot = topHalfTransform.rotation;
         topHalfBox = topHalfTransform.GetComponent<BoxCollider>();
         halfInitSize = topHalfBox.bounds.size;
 
         bottomHalfTransform = transforms[3];
-        bottomHalfInitPos = bottomHalfTransform.position;
+        bottomHalfInitPos = bottomHalfTransform.localPosition;
         bottomHalfInitRot = bottomHalfTransform.rotation;
         bottomHalfBox = bottomHalfTransform.GetComponent<BoxCollider>();
     }
@@ -207,18 +207,28 @@ public class MoveCube : MonoBehaviour
         }
         else
         {
-            if (divided && changeHalvesAction.WasPressedThisFrame())
+            if (divided)
             {
-                if (currentTransform == topHalfTransform) 
+                Vector3 topHalfCenter = topHalfBox.bounds.center;
+                Vector3 bottomHalfCenter = bottomHalfBox.bounds.center;
+
+                if (Vector3.Distance(topHalfCenter, bottomHalfCenter) <= size.x)
                 {
-                    currentTransform = bottomHalfTransform;
-                    currentBox = bottomHalfBox;
+                    Recombine();
+                    return;
                 }
-                else 
-                {
-                    currentTransform = topHalfTransform;
-                    currentBox = topHalfBox;
-                }
+
+                if (changeHalvesAction.WasPressedThisFrame())
+                    if (currentTransform == topHalfTransform) 
+                    {
+                        currentTransform = bottomHalfTransform;
+                        currentBox = bottomHalfBox;
+                    }
+                    else 
+                    {
+                        currentTransform = topHalfTransform;
+                        currentBox = topHalfBox;
+                    }
             }
 
 			// Read the move action for input
@@ -266,11 +276,7 @@ public class MoveCube : MonoBehaviour
                     if (!isLyingX()) halfSize = new Vector3(halfSize.x, halfSize.z, halfSize.y);
                 }
 
-                Debug.Log(currentBox.bounds.center);
-                Debug.Log(rotPoint);
-
                 size = 2*halfSize;
-
             }
         }
     }
@@ -281,10 +287,10 @@ public class MoveCube : MonoBehaviour
         fullTransform.position = fullInitPos;
 
         topHalfTransform.rotation = topHalfInitRot;
-        topHalfTransform.position = topHalfInitPos;
+        topHalfTransform.localPosition = topHalfInitPos;
 
         bottomHalfTransform.rotation = bottomHalfInitRot;
-        bottomHalfTransform.position = bottomHalfInitPos;
+        bottomHalfTransform.localPosition = bottomHalfInitPos;
 
         currentTransform = fullTransform;
         currentBox = fullBox;
@@ -311,6 +317,12 @@ public class MoveCube : MonoBehaviour
         size = halfInitSize;
         halfSize = size/2.0f;
 
+        topHalfTransform.rotation = topHalfInitRot;
+        topHalfTransform.localPosition = topHalfInitPos;
+
+        bottomHalfTransform.rotation = bottomHalfInitRot;
+        bottomHalfTransform.localPosition = bottomHalfInitPos;
+
         currentTransform = topHalfTransform;
         currentBox = topHalfBox;
     }
@@ -322,6 +334,12 @@ public class MoveCube : MonoBehaviour
 
         size = fullInitSize;
         halfSize = size/2.0f;
+
+        topHalfTransform.rotation = topHalfInitRot;
+        topHalfTransform.localPosition = topHalfInitPos;
+
+        bottomHalfTransform.rotation = bottomHalfInitRot;
+        bottomHalfTransform.localPosition = bottomHalfInitPos;
 
         currentTransform = fullTransform;
         currentBox = fullBox;
