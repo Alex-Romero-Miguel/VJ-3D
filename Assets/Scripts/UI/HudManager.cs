@@ -7,10 +7,16 @@ public class HudManager : MonoBehaviour
     public static HudManager Instance;
 
     public TextMeshProUGUI movementText;
-    public TextMeshProUGUI levelDisplay;
+    public TextMeshProUGUI levelText;
 
     private int movements = 0;
     private int lastLevel = 1;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     void Start()
     {
@@ -37,7 +43,7 @@ public class HudManager : MonoBehaviour
     public void UpdateLevel()
     {
         lastLevel = LevelManager.Instance.GetCurrentLevel();
-        levelDisplay.text = $"Stage {lastLevel}";
+        levelText.text = $"Stage {lastLevel}";
     }
 
 

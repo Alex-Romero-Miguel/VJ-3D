@@ -280,4 +280,9 @@ public class MoveCube : MonoBehaviour
         
         animated = false;
     }
+
+    public void SetInitPos(Vector3 pos)
+    {
+        initPos = pos;
+    }
 }

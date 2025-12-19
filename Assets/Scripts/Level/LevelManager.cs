@@ -40,6 +40,7 @@ public class LevelManager : MonoBehaviour
     public void ResetToFirstLevel()
     {
         currentLevel = 0;
+        HudManager.Instance.UpdateLevel();
         BeginGame();
     }
 
@@ -47,7 +48,6 @@ public class LevelManager : MonoBehaviour
     { 
         return currentLevel+1; 
     }
-
 
     private void Start()
     {
@@ -124,7 +124,6 @@ public class LevelManager : MonoBehaviour
 
     public void CompleteLevel()
     {
-        //HudManager.Instance.UpdateLevel();
         StartCoroutine(NextLevel());
     }
 
@@ -145,6 +144,7 @@ public class LevelManager : MonoBehaviour
         currentLevel++;
         if (currentLevel < maps.Length)
         {
+            HudManager.Instance.UpdateLevel();
             // Cargar siguiente nivel
             yield return StartCoroutine(StartLevel());
         }
@@ -152,6 +152,7 @@ public class LevelManager : MonoBehaviour
         {
             // Terminar juego
             currentLevel = 0;
+            HudManager.Instance.UpdateLevel();
             yield return StartCoroutine(CompleteGame());
         }
     }
@@ -168,6 +169,7 @@ public class LevelManager : MonoBehaviour
         yield return new WaitForSeconds(levelAnimationDelay);
 
         currentLevel = levelIndex;
+        HudManager.Instance.UpdateLevel();
         yield return StartCoroutine(StartLevel());
     }
 
@@ -186,6 +188,9 @@ public class LevelManager : MonoBehaviour
 
         Vector3 origin = Vector3.zero;
         tiles = mapCreator.CreateMap(mapFile, origin);
+        Vector3 posPlayer = mapCreator.PlayerStartWorldPos;
+
+        player.SetInitPos(posPlayer);
     }
 
     private void UnloadLevel()

@@ -38,8 +38,8 @@ public class MenuManager : MonoBehaviour
     public void StartNewGame()
     {
         // Reiniciar el contador de movimientos
-        //HudManager hudManager = hud.GetComponent<HudManager>();
-        //if (hudManager != null) hudManager.ResetCounter(); 
+        HudManager hudManager = hud.GetComponent<HudManager>();
+        if (hudManager != null) hudManager.ResetCounter();
 
         main.SetActive(false);
         hud.SetActive(true);
@@ -65,6 +65,11 @@ public class MenuManager : MonoBehaviour
     {
         main.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(true);
+    }
+
+    public void CloseSettings()
+    {
+        if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
     public void ExitGame()
