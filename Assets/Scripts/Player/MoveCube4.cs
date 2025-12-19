@@ -12,23 +12,30 @@ using System.Collections;
 
 public class MoveCube : MonoBehaviour
 {
-	public float rotSpeed; 			// Rotation speed in degrees per second
-    public float fallAcceleration; 		// Fall acceleration in the Y direction
-    public AudioClip fallSound; 	// Sound to play when the cube starts falling
-    public AudioClip[] moveSounds; 		// Sounds to play when the cube rotates
+	public float rotSpeed; 			        // Rotation speed in degrees per second
+    public float fallAcceleration; 		    // Fall acceleration in the Y direction
+    public AudioClip fallSound; 	        // Sound to play when the cube starts falling
+    public AudioClip[] moveSounds; 		    // Sounds to play when the cube rotates
 
     private bool bMoving = false; 			// Is the object in the middle of moving?
 	private bool bFalling = false; 			// Is the object falling?
     private bool animated = false;
+    private bool divided = false;
     private float fallSpeed = 0f;
 	private float rotRemainder; 			// The angle that the cube still has to rotate before the current movement is completed
     private float rotDir; 					// Has rotRemainder to be applied in the positive or negative direction?
-    private Vector3 initPos, initSize; 		// Initial position and size of the cube
-    private Quaternion initRot; 	        // Initial rotation of the cube
+    private Vector3 fullInitSize, halfInitSize; 		                    // Initial position and size of the cube
+    private Vector3 fullInitPos, topHalfInitPos, bottomHalfInitPos;
+    private Quaternion fullInitRot, bottomHalfInitRot, topHalfInitRot; 	    // Initial rotation of the cube
+    private BoxCollider currentBox, fullBox, topHalfBox, bottomHalfBox;
     private Vector3 rotPoint, rotAxis; 		// Rotation movement is performed around the line formed by rotPoint and rotAxis
-    private InputAction moveAction; 		// Input action to capture player movement (WASD + cursor keys)
+    private InputAction moveAction;         // Input action to capture player movement (WASD + cursor keys)
+    private InputAction changeHalvesAction; 		
     private LayerMask layerMask; 			// LayerMask to detect raycast hits with ground tiles only
     private Vector3 size, halfSize;
+    private Transform currentTransform;
+    
+    private Transform fullTransform, topHalfTransform, bottomHalfTransform;
     private LevelManager levelManager;
 	
 	
@@ -39,14 +46,14 @@ public class MoveCube : MonoBehaviour
     {
         RaycastHit hit;
 
-        if (isStanding()) return Physics.Raycast(transform.position, Vector3.down, out hit, size.y, layerMask);
+        if (isStanding()) return Physics.Raycast(currentBox.bounds.center, Vector3.down, out hit, size.y, layerMask);
 
         Vector3 offset = Vector3.zero;
 
         if (isLyingX()) offset = Vector3.right * halfSize.x / 2;
         else if (isLyingZ()) offset = Vector3.forward * halfSize.z / 2;
         
-        return Physics.Raycast(transform.position + offset, Vector3.down, out hit, size.y, layerMask) && Physics.Raycast(transform.position - offset, Vector3.down, out hit, size.y, layerMask);
+        return Physics.Raycast(currentBox.bounds.center + offset, Vector3.down, out hit, size.y, layerMask) && Physics.Raycast(currentBox.bounds.center - offset, Vector3.down, out hit, size.y, layerMask);
     }
 
     private void prepareFallingRotation()
@@ -62,30 +69,30 @@ public class MoveCube : MonoBehaviour
         if (isLyingX()) 
         {
             offset = Vector3.right * halfSize.x / 2;
-            plus = Physics.Raycast(transform.position + offset, Vector3.down, out hit, size.y, layerMask);
-            minus = Physics.Raycast(transform.position - offset, Vector3.down, out hit, size.y, layerMask);
+            plus = Physics.Raycast(currentBox.bounds.center + offset, Vector3.down, out hit, size.y, layerMask);
+            minus = Physics.Raycast(currentBox.bounds.center - offset, Vector3.down, out hit, size.y, layerMask);
             
             if (plus == minus) return;
             
             rotAxis = Vector3.forward;
             rotDir = plus ? -1f : 1f;
 
-            rotPoint = transform.position + new Vector3(0f, -halfSize.y, 0f);
+            rotPoint = currentBox.bounds.center + new Vector3(0f, -halfSize.y, 0f);
 
             rotRemainder = 90f;
         }
         else if (isLyingZ()) 
         {
             offset = Vector3.forward * halfSize.z / 2;
-            plus = Physics.Raycast(transform.position + offset, Vector3.down, out hit, size.y, layerMask);
-            minus = Physics.Raycast(transform.position - offset, Vector3.down, out hit, size.y, layerMask);
+            plus = Physics.Raycast(currentBox.bounds.center + offset, Vector3.down, out hit, size.y, layerMask);
+            minus = Physics.Raycast(currentBox.bounds.center - offset, Vector3.down, out hit, size.y, layerMask);
 
             if (plus == minus) return;
             
             rotAxis = Vector3.right;
             rotDir = plus ? -1f : 1f;
 
-            rotPoint = transform.position + new Vector3(0f, -halfSize.y, 0f);
+            rotPoint = currentBox.bounds.center + new Vector3(0f, -halfSize.y, 0f);
             
             rotRemainder = 90f;
         }        
@@ -108,11 +115,24 @@ public class MoveCube : MonoBehaviour
 
     private void Awake()
     {
-        initPos = transform.position;
-        initRot = transform.rotation;
+        Transform[] transforms = GetComponentsInChildren<Transform>();
 
-        BoxCollider box = GetComponent<BoxCollider>();
-        initSize = box.bounds.size;
+        fullTransform = transforms[0];
+        fullInitPos = fullTransform.position;
+        fullInitRot = fullTransform.rotation;
+        fullBox = fullTransform.GetComponent<BoxCollider>();
+        fullInitSize = fullBox.bounds.size;
+
+        topHalfTransform = transforms[1];
+        topHalfInitPos = topHalfTransform.position;
+        topHalfInitRot = topHalfTransform.rotation;
+        topHalfBox = topHalfTransform.GetComponent<BoxCollider>();
+        halfInitSize = topHalfBox.bounds.size;
+
+        bottomHalfTransform = transforms[3];
+        bottomHalfInitPos = bottomHalfTransform.position;
+        bottomHalfInitRot = bottomHalfTransform.rotation;
+        bottomHalfBox = bottomHalfTransform.GetComponent<BoxCollider>();
     }
 
     // Start is called once after the MonoBehaviour is created
@@ -120,14 +140,18 @@ public class MoveCube : MonoBehaviour
     {
 		// Find the move action by name. Done once in the Start method to avoid doing it every Update call.
         moveAction = InputSystem.actions.FindAction("Move");
+        changeHalvesAction = InputSystem.actions.FindAction("ChangeHalves");
 		
 		// Create the layer mask for ground tiles. Done once in the Start method to avoid doing it every Update call.
         layerMask = LayerMask.GetMask("Ground");
 
         levelManager = LevelManager.Instance;
 
-        size = initSize;
-        halfSize = initSize/2.0f; 
+        currentTransform = fullTransform;
+        currentBox = fullBox;
+
+        size = fullInitSize;
+        halfSize = size/2.0f; 
     }
 
     // Update is called once per frame
@@ -140,19 +164,19 @@ public class MoveCube : MonoBehaviour
             if (rotRemainder > 0f)
             {
                 float amount = 2f * rotSpeed * Time.deltaTime;
-                transform.RotateAround(rotPoint, rotAxis, amount * rotDir);
+                currentTransform.RotateAround(rotPoint, rotAxis, amount * rotDir);
 
                 rotRemainder -= amount;
             }
             else
             {
                 fallSpeed += fallAcceleration * Time.deltaTime;
-                transform.position += Vector3.down * fallSpeed * Time.deltaTime;
+                currentTransform.position += Vector3.down * fallSpeed * Time.deltaTime;
             
                 float amount = 2f * rotSpeed * Time.deltaTime;
-                transform.rotation = Quaternion.AngleAxis(amount * rotDir, rotAxis) * transform.rotation;
+                currentTransform.rotation = Quaternion.AngleAxis(amount * rotDir, rotAxis) * currentTransform.rotation;
 
-                if (transform.position.y < -10f) levelManager.Restart();
+                if (currentTransform.position.y < -10f) levelManager.Restart();
             }
         }
         else if (bMoving)
@@ -162,12 +186,12 @@ public class MoveCube : MonoBehaviour
             float amount = rotSpeed * Time.deltaTime;
             if(amount > rotRemainder)
             {
-                transform.RotateAround(rotPoint, rotAxis, rotRemainder * rotDir);
+                currentTransform.RotateAround(rotPoint, rotAxis, rotRemainder * rotDir);
                 bMoving = false;
             }
             else
             {
-                transform.RotateAround(rotPoint, rotAxis, amount * rotDir);
+                currentTransform.RotateAround(rotPoint, rotAxis, amount * rotDir);
                 rotRemainder -= amount;
             }
         }
@@ -179,10 +203,24 @@ public class MoveCube : MonoBehaviour
             fallSpeed = 7f;
             
             // Play sound associated to falling
-            AudioSource.PlayClipAtPoint(fallSound, transform.position, 1.5f);
+            AudioSource.PlayClipAtPoint(fallSound, currentTransform.position, 1.5f);
         }
         else
         {
+            if (divided && changeHalvesAction.WasPressedThisFrame())
+            {
+                if (currentTransform == topHalfTransform) 
+                {
+                    currentTransform = bottomHalfTransform;
+                    currentBox = bottomHalfBox;
+                }
+                else 
+                {
+                    currentTransform = topHalfTransform;
+                    currentBox = topHalfBox;
+                }
+            }
+
 			// Read the move action for input
             Vector2 dir = moveAction.ReadValue<Vector2>();
             if(Math.Abs(dir.x) > 0.99 || Math.Abs(dir.y) > 0.99)
@@ -192,7 +230,7 @@ public class MoveCube : MonoBehaviour
 				
 				// We play a random movemnt sound
                 int iSound = UnityEngine.Random.Range(0, moveSounds.Length);
-                AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
+                AudioSource.PlayClipAtPoint(moveSounds[iSound], currentTransform.position, 1.0f);
 				
 				// Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
                 if (dir.x > 0.99)
@@ -200,7 +238,7 @@ public class MoveCube : MonoBehaviour
                     rotDir = -1.0f;
                     rotRemainder = 90.0f;
                     rotAxis = Vector3.forward;
-                    rotPoint = transform.position + new Vector3(halfSize.x, -halfSize.y, 0.0f);
+                    rotPoint = currentBox.bounds.center + new Vector3(halfSize.x, -halfSize.y, 0.0f);
                     if (!isLyingZ()) halfSize = new Vector3(halfSize.y, halfSize.x, halfSize.z);
                 }
                 else if (dir.x < -0.99) 
@@ -208,7 +246,7 @@ public class MoveCube : MonoBehaviour
                     rotDir = 1.0f;
                     rotRemainder = 90.0f;
                     rotAxis = Vector3.forward;
-                    rotPoint = transform.position + new Vector3(-halfSize.x, -halfSize.y, 0.0f);
+                    rotPoint = currentBox.bounds.center + new Vector3(-halfSize.x, -halfSize.y, 0.0f);
                     if (!isLyingZ()) halfSize = new Vector3(halfSize.y, halfSize.x, halfSize.z);
                 }
                 else if (dir.y > 0.99)  
@@ -216,7 +254,7 @@ public class MoveCube : MonoBehaviour
                     rotDir = 1.0f;
                     rotRemainder = 90.0f;
                     rotAxis = Vector3.right;
-                    rotPoint = transform.position + new Vector3(0.0f, -halfSize.y, halfSize.z);
+                    rotPoint = currentBox.bounds.center + new Vector3(0.0f, -halfSize.y, halfSize.z);
                     if (!isLyingX()) halfSize = new Vector3(halfSize.x, halfSize.z, halfSize.y);
                 }
                 else if (dir.y < -0.99) 
@@ -224,9 +262,12 @@ public class MoveCube : MonoBehaviour
                     rotDir = -1.0f;
                     rotRemainder = 90.0f;
                     rotAxis = Vector3.right;
-                    rotPoint = transform.position + new Vector3(0.0f, -halfSize.y, -halfSize.z);
+                    rotPoint = currentBox.bounds.center + new Vector3(0.0f, -halfSize.y, -halfSize.z);
                     if (!isLyingX()) halfSize = new Vector3(halfSize.x, halfSize.z, halfSize.y);
                 }
+
+                Debug.Log(currentBox.bounds.center);
+                Debug.Log(rotPoint);
 
                 size = 2*halfSize;
 
@@ -235,13 +276,23 @@ public class MoveCube : MonoBehaviour
     }
 
     public void Reset()
-    {       
-        transform.rotation = initRot;
-        transform.position = initPos;
+    {
+        fullTransform.rotation = fullInitRot;
+        fullTransform.position = fullInitPos;
 
-        size = initSize;
-        halfSize = initSize/2.0f;
+        topHalfTransform.rotation = topHalfInitRot;
+        topHalfTransform.position = topHalfInitPos;
 
+        bottomHalfTransform.rotation = bottomHalfInitRot;
+        bottomHalfTransform.position = bottomHalfInitPos;
+
+        currentTransform = fullTransform;
+        currentBox = fullBox;
+
+        size = fullInitSize;
+        halfSize = size/2.0f;
+
+        divided = false;
         bFalling = false;
         bMoving = false;
     }
@@ -253,8 +304,27 @@ public class MoveCube : MonoBehaviour
 
     public void Divide()
     {
-        // TODO: Implement
         Debug.Log("Divided");
+
+        divided = true;
+
+        size = halfInitSize;
+        halfSize = size/2.0f;
+
+        currentTransform = topHalfTransform;
+        currentBox = topHalfBox;
+    }
+
+    public void Recombine()
+    {
+        Debug.Log("Recombine");
+        divided = false;
+
+        size = fullInitSize;
+        halfSize = size/2.0f;
+
+        currentTransform = fullTransform;
+        currentBox = fullBox;
     }
 
     public IEnumerator AnimateSlide(float duration = 0.8f)
@@ -262,14 +332,14 @@ public class MoveCube : MonoBehaviour
         yield return new WaitUntil(() => !bMoving);
 
         animated = true;
-        Vector3 start = transform.position;
-        Vector3 end = transform.position + Vector3.down * 3f;
+        Vector3 start = currentTransform.position;
+        Vector3 end = currentTransform.position + Vector3.down * 3f;
 
         float t = 0;
         while (t < duration)
         {
             t += Time.deltaTime;
-            transform.position = Vector3.Lerp(start, end, t / duration);
+            currentTransform.position = Vector3.Lerp(start, end, t / duration);
             yield return null;
         }
         
