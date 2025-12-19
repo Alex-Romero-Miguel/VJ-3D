@@ -51,7 +51,7 @@ public class BridgeTile : MonoBehaviour, ITileConfigurable
     private void CacheRotations()
     {
         openRot = hinge.localRotation;
-        closedRot = openRot * Quaternion.Euler(0, 0, -90);
+        closedRot = openRot * Quaternion.Euler(0, 0, 180);
     }
 
     private void ApplyRotation()

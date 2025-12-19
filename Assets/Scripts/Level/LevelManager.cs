@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -36,6 +37,18 @@ public class LevelManager : MonoBehaviour
         numberAction = InputSystem.actions.FindAction("Go To Level");
     }
 
+    public void ResetToFirstLevel()
+    {
+        currentLevel = 0;
+        BeginGame();
+    }
+
+    public int GetCurrentLevel()
+    { 
+        return currentLevel+1; 
+    }
+
+
     private void Start()
     {
         animationsRunning = 0;
@@ -66,6 +79,7 @@ public class LevelManager : MonoBehaviour
 
     public void BeginGame() 
     {
+        playerReference.SetActive(false);
         StartCoroutine(StartLevel());
     }
 
@@ -89,9 +103,14 @@ public class LevelManager : MonoBehaviour
 
         yield return StartCoroutine(MapFallAnimation());
 
+        UnloadLevel();
+
         yield return new WaitForSeconds(levelAnimationDelay);
 
         if(transitioning) yield break;
+
+        LoadLevel(currentLevel);
+
         yield return StartCoroutine(MapRiseAnimation());
 
         playerReference.SetActive(true);
@@ -105,6 +124,7 @@ public class LevelManager : MonoBehaviour
 
     public void CompleteLevel()
     {
+        HudManager.Instance.UpdateLevel();
         StartCoroutine(NextLevel());
     }
 
@@ -301,4 +321,5 @@ public class LevelManager : MonoBehaviour
         yield return StartCoroutine(player.AnimateSlide());
         transitioning = false;
     }
+
 }

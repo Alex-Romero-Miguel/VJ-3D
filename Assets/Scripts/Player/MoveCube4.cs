@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
-using System.Collections;
 
 
 // MoveCube manages cube movement. WASD + Cursor keys rotate the cube in the
@@ -30,10 +31,12 @@ public class MoveCube : MonoBehaviour
     private LayerMask layerMask; 			// LayerMask to detect raycast hits with ground tiles only
     private Vector3 size, halfSize;
     private LevelManager levelManager;
-	
-	
-	// Determine if the cube is grounded by shooting a ray down from the cube location and 
-	// looking for hits with ground tiles
+
+    public UnityEvent onMoveMade;
+
+
+    // Determine if the cube is grounded by shooting a ray down from the cube location and 
+    // looking for hits with ground tiles
 
     private bool isGrounded()
     {
@@ -189,8 +192,10 @@ public class MoveCube : MonoBehaviour
             {
 				// If the absolute value of one of the axis is larger than 0.99, the player wants to move in a non diagonal direction
                 bMoving = true;
-				
-				// We play a random movemnt sound
+
+                onMoveMade.Invoke();
+
+                // We play a random movemnt sound
                 int iSound = UnityEngine.Random.Range(0, moveSounds.Length);
                 AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
 				
