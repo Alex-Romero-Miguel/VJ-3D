@@ -124,7 +124,7 @@ public class LevelManager : MonoBehaviour
 
     public void CompleteLevel()
     {
-        HudManager.Instance.UpdateLevel();
+        //HudManager.Instance.UpdateLevel();
         StartCoroutine(NextLevel());
     }
 

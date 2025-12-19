@@ -31,8 +31,7 @@ public class HudManager : MonoBehaviour
 
     void UpdateUI()
     {
-        Debug.Log(movements);
-        movementText.text = movements.ToString();
+        movementText.text = movements.ToString("D6");
     }
 
     public void UpdateLevel()
