@@ -21,8 +21,6 @@ public class FragileTile : TileBase
             //StartCoroutine(LevelManager.Instance.RestartLevel());
         }
     }
-
-
     private IEnumerator BreakSequence()
     {
         broken = true;

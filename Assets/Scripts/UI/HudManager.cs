@@ -15,7 +15,6 @@ public class HudManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
     }
 
     void Start()
@@ -37,7 +36,7 @@ public class HudManager : MonoBehaviour
 
     void UpdateUI()
     {
-        movementText.text = movements.ToString("D6");
+        movementText.text = "Moves: " + movements.ToString("D6");
     }
 
     public void UpdateLevel()

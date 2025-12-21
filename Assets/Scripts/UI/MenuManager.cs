@@ -49,7 +49,6 @@ public class MenuManager : MonoBehaviour
     public void ResumeGame() // Volver al juego
     {
         main.SetActive(false);
-        credits.SetActive(false);
         pausePanel.SetActive(false);
         hud.SetActive(true);
         Time.timeScale = 1f;
@@ -57,13 +56,16 @@ public class MenuManager : MonoBehaviour
 
     public void OpenInstructions()
     {
-        main.SetActive(false);
         if (instructionsPanel != null) instructionsPanel.SetActive(true);
+    }
+
+    public void CloseInstructions()
+    {
+        if (instructionsPanel != null) instructionsPanel.SetActive(false);
     }
 
     public void OpenSettings()
     {
-        main.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(true);
     }
 

@@ -34,6 +34,8 @@ public class MoveCube : MonoBehaviour
 
     public UnityEvent onMoveMade;
 
+    [SerializeField] private AudioSource sfxSource;
+
 
     // Determine if the cube is grounded by shooting a ray down from the cube location and 
     // looking for hits with ground tiles
@@ -182,7 +184,8 @@ public class MoveCube : MonoBehaviour
             fallSpeed = 7f;
             
             // Play sound associated to falling
-            AudioSource.PlayClipAtPoint(fallSound, transform.position, 1.5f);
+            //AudioSource.PlayClipAtPoint(fallSound, transform.position, 1.5f);
+            sfxSource.PlayOneShot(fallSound, 1.5f);
         }
         else
         {
@@ -197,9 +200,10 @@ public class MoveCube : MonoBehaviour
 
                 // We play a random movemnt sound
                 int iSound = UnityEngine.Random.Range(0, moveSounds.Length);
-                AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
-				
-				// Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
+                //AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
+                sfxSource.PlayOneShot(moveSounds[iSound], 1.0f);
+
+                // Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
                 if (dir.x > 0.99)
                 {   // right
                     rotDir = -1.0f;
@@ -278,6 +282,12 @@ public class MoveCube : MonoBehaviour
             yield return null;
         }
         
+        animated = false;
+    }
+
+    public void DisableMovement()
+    {
+        bMoving = false;
         animated = false;
     }
 

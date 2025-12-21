@@ -40,7 +40,7 @@ public class LevelManager : MonoBehaviour
     public void ResetToFirstLevel()
     {
         currentLevel = 0;
-        HudManager.Instance.UpdateLevel();
+        if (HudManager.Instance != null) HudManager.Instance.UpdateLevel();
         BeginGame();
     }
 
