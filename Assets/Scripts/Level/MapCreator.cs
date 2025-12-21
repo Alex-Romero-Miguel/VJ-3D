@@ -11,6 +11,8 @@ public class MapCreator : MonoBehaviour
 
     private GameObject mapRoot;
 
+    public Vector3 PlayerStartWorldPos { get; private set; }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -119,6 +121,19 @@ public class MapCreator : MonoBehaviour
                 spawnedTiles.Add(tile);
             }
         }
+
+
+        // Leer posicion inicial del jugador
+        PlayerStartWorldPos = new Vector3(5, 1f, sizeZminus1 - 10);
+        if (tokens.Length >= index + 2)
+        {
+            int pz = int.Parse(tokens[index++]); // fila (z en el mapa)
+            int px = int.Parse(tokens[index++]); // columna (x)
+
+            //Vector3 spawn = origin + new Vector3(px, 1f, sizeZminus1 - pz);
+            PlayerStartWorldPos = new Vector3(px, 1f, sizeZminus1 - pz);
+        }
+
         return spawnedTiles;
     }
 

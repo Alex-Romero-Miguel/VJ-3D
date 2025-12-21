@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
-using System.Collections;
 
 
 // MoveCube manages cube movement. WASD + Cursor keys rotate the cube in the
@@ -37,10 +38,14 @@ public class MoveCube : MonoBehaviour
     
     private Transform fullTransform, topHalfTransform, bottomHalfTransform;
     private LevelManager levelManager;
-	
-	
-	// Determine if the cube is grounded by shooting a ray down from the cube location and 
-	// looking for hits with ground tiles
+
+    public UnityEvent onMoveMade;
+
+    [SerializeField] private AudioSource sfxSource;
+
+
+    // Determine if the cube is grounded by shooting a ray down from the cube location and 
+    // looking for hits with ground tiles
 
     private bool isGrounded()
     {
@@ -203,7 +208,8 @@ public class MoveCube : MonoBehaviour
             fallSpeed = 7f;
             
             // Play sound associated to falling
-            AudioSource.PlayClipAtPoint(fallSound, currentTransform.position, 1.5f);
+            //AudioSource.PlayClipAtPoint(fallSound, transform.position, 1.5f);
+            sfxSource.PlayOneShot(fallSound, 1.5f);
         }
         else
         {
@@ -237,12 +243,15 @@ public class MoveCube : MonoBehaviour
             {
 				// If the absolute value of one of the axis is larger than 0.99, the player wants to move in a non diagonal direction
                 bMoving = true;
-				
-				// We play a random movemnt sound
+
+                onMoveMade.Invoke();
+
+                // We play a random movemnt sound
                 int iSound = UnityEngine.Random.Range(0, moveSounds.Length);
-                AudioSource.PlayClipAtPoint(moveSounds[iSound], currentTransform.position, 1.0f);
-				
-				// Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
+                //AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
+                sfxSource.PlayOneShot(moveSounds[iSound], 1.0f);
+
+                // Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
                 if (dir.x > 0.99)
                 {   // right
                     rotDir = -1.0f;
@@ -362,5 +371,16 @@ public class MoveCube : MonoBehaviour
         }
         
         animated = false;
+    }
+
+    public void DisableMovement()
+    {
+        bMoving = false;
+        animated = false;
+    }
+
+    public void SetInitPos(Vector3 pos)
+    {
+        initPos = pos;
     }
 }

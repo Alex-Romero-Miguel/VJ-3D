@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -36,6 +37,18 @@ public class LevelManager : MonoBehaviour
         numberAction = InputSystem.actions.FindAction("Go To Level");
     }
 
+    public void ResetToFirstLevel()
+    {
+        currentLevel = 0;
+        if (HudManager.Instance != null) HudManager.Instance.UpdateLevel();
+        BeginGame();
+    }
+
+    public int GetCurrentLevel()
+    { 
+        return currentLevel+1; 
+    }
+
     private void Start()
     {
         animationsRunning = 0;
@@ -66,6 +79,7 @@ public class LevelManager : MonoBehaviour
 
     public void BeginGame() 
     {
+        playerReference.SetActive(false);
         StartCoroutine(StartLevel());
     }
 
@@ -89,9 +103,14 @@ public class LevelManager : MonoBehaviour
 
         yield return StartCoroutine(MapFallAnimation());
 
+        UnloadLevel();
+
         yield return new WaitForSeconds(levelAnimationDelay);
 
         if(transitioning) yield break;
+
+        LoadLevel(currentLevel);
+
         yield return StartCoroutine(MapRiseAnimation());
 
         playerReference.SetActive(true);
@@ -125,6 +144,7 @@ public class LevelManager : MonoBehaviour
         currentLevel++;
         if (currentLevel < maps.Length)
         {
+            HudManager.Instance.UpdateLevel();
             // Cargar siguiente nivel
             yield return StartCoroutine(StartLevel());
         }
@@ -132,6 +152,7 @@ public class LevelManager : MonoBehaviour
         {
             // Terminar juego
             currentLevel = 0;
+            HudManager.Instance.UpdateLevel();
             yield return StartCoroutine(CompleteGame());
         }
     }
@@ -148,6 +169,7 @@ public class LevelManager : MonoBehaviour
         yield return new WaitForSeconds(levelAnimationDelay);
 
         currentLevel = levelIndex;
+        HudManager.Instance.UpdateLevel();
         yield return StartCoroutine(StartLevel());
     }
 
@@ -166,6 +188,9 @@ public class LevelManager : MonoBehaviour
 
         Vector3 origin = Vector3.zero;
         tiles = mapCreator.CreateMap(mapFile, origin);
+        Vector3 posPlayer = mapCreator.PlayerStartWorldPos;
+
+        player.SetInitPos(posPlayer);
     }
 
     private void UnloadLevel()
@@ -301,4 +326,5 @@ public class LevelManager : MonoBehaviour
         yield return StartCoroutine(player.AnimateSlide());
         transitioning = false;
     }
+
 }
