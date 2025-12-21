@@ -3,14 +3,13 @@ using System.Collections.Generic;
 
 public class BridgeButton : TileBase, ITileConfigurable
 {
-    // Marca esto como TRUE solo en el prefab del botón Cruz (Strict)
+    // Marca esto como TRUE solo en el prefab del botï¿½n Cruz (Strict)
     public bool isStrictButton;
 
     public int channelID; // Asignado por MapCreator
-    private bool isPressed = false;
     private List<BridgeTile> connectedBridges = new List<BridgeTile>();
 
-    // Esta función la llama MapCreator al crear el mapa
+    // Esta funciï¿½n la llama MapCreator al crear el mapa
     public void Configure(int id, string extra)
     {
         this.channelID = id;
@@ -28,7 +27,7 @@ public class BridgeButton : TileBase, ITileConfigurable
 
             }
         }
-        //Debug.Log($"Botón ID {channelID} encontró {connectedBridges.Count} puentes.");
+        //Debug.Log($"Botï¿½n ID {channelID} encontrï¿½ {connectedBridges.Count} puentes.");
     }
 
     protected override void Activate(Collider other)
@@ -36,7 +35,7 @@ public class BridgeButton : TileBase, ITileConfigurable
         MoveCube player = other.GetComponent<MoveCube>();
         if (player == null) return;
 
-        // Botón CRUZ
+        // Botï¿½n CRUZ
         if (isStrictButton)
         {
             //Debug.Log("cruz");
@@ -52,9 +51,7 @@ public class BridgeButton : TileBase, ITileConfigurable
 
     private void PressButton()
     {
-        isPressed = true;
-
-        // Animación visual del botón bajando
+        // Animaciï¿½n visual del botï¿½n bajando
         TileAnimator animator = GetComponent<TileAnimator>();
 
         // Activar todos los puentes conectados
@@ -68,7 +65,7 @@ public class BridgeButton : TileBase, ITileConfigurable
         }
     }
 
-    // Dibuja una línea en el editor para ver a qué puentes está conectado
+    // Dibuja una lï¿½nea en el editor para ver a quï¿½ puentes estï¿½ conectado
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
