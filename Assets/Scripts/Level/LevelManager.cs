@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class LevelManager : MonoBehaviour
     private int currentLevel;
     private int animationsRunning;
     private MapCreator mapCreator;
+    private MenuManager menuManager;
     private MoveCube player;
     private InputAction numberAction;
     private List<GameObject> tiles;
@@ -35,17 +37,29 @@ public class LevelManager : MonoBehaviour
         numberAction = InputSystem.actions.FindAction("Go To Level");
     }
 
+    public void ResetToFirstLevel()
+    {
+        currentLevel = 0;
+        if (HudManager.Instance != null) HudManager.Instance.UpdateLevel();
+        BeginGame();
+    }
+
+    public int GetCurrentLevel()
+    { 
+        return currentLevel+1; 
+    }
+
     private void Start()
     {
         animationsRunning = 0;
         tiles = new List<GameObject>();
         mapCreator = MapCreator.Instance;
+        menuManager = MenuManager.Instance;
         player = playerReference.GetComponent<MoveCube>();
 
         transitioning = false;
         currentLevel = 0;
         playerReference.SetActive(false);
-        StartCoroutine(StartLevel());
     }
 
     // Atajo: teclas numéricas para saltar niveles (del 1 al 9, y el 0 como el 10)
@@ -61,6 +75,12 @@ public class LevelManager : MonoBehaviour
             if (targetLevel == currentLevel) StartCoroutine(RestartLevel());
             else StartCoroutine(ChangeLevel(targetLevel));
         }
+    }
+
+    public void BeginGame() 
+    {
+        playerReference.SetActive(false);
+        StartCoroutine(StartLevel());
     }
 
     // Inicia el nivel actual
@@ -83,13 +103,23 @@ public class LevelManager : MonoBehaviour
 
         yield return StartCoroutine(MapFallAnimation());
 
+        UnloadLevel();
+
         yield return new WaitForSeconds(levelAnimationDelay);
 
         if(transitioning) yield break;
+
+        LoadLevel(currentLevel);
+
         yield return StartCoroutine(MapRiseAnimation());
 
         playerReference.SetActive(true);
         player.Reset();
+    }
+
+    public void Restart()
+    {
+        StartCoroutine(RestartLevel());
     }
 
     public void CompleteLevel()
@@ -102,7 +132,7 @@ public class LevelManager : MonoBehaviour
     {
         if(transitioning) yield break;
 
-        yield return StartCoroutine(PlayerFallAnimation());
+        yield return StartCoroutine(PlayerSlideAnimation());
         playerReference.SetActive(false);
 
         // Animación de victoria
@@ -114,12 +144,15 @@ public class LevelManager : MonoBehaviour
         currentLevel++;
         if (currentLevel < maps.Length)
         {
+            HudManager.Instance.UpdateLevel();
             // Cargar siguiente nivel
             yield return StartCoroutine(StartLevel());
         }
         else
         {
             // Terminar juego
+            currentLevel = 0;
+            HudManager.Instance.UpdateLevel();
             yield return StartCoroutine(CompleteGame());
         }
     }
@@ -136,6 +169,7 @@ public class LevelManager : MonoBehaviour
         yield return new WaitForSeconds(levelAnimationDelay);
 
         currentLevel = levelIndex;
+        HudManager.Instance.UpdateLevel();
         yield return StartCoroutine(StartLevel());
     }
 
@@ -154,6 +188,9 @@ public class LevelManager : MonoBehaviour
 
         Vector3 origin = Vector3.zero;
         tiles = mapCreator.CreateMap(mapFile, origin);
+        Vector3 posPlayer = mapCreator.PlayerStartWorldPos;
+
+        player.SetInitPos(posPlayer);
     }
 
     private void UnloadLevel()
@@ -168,9 +205,11 @@ public class LevelManager : MonoBehaviour
     // Función de marcador para el final del juego
     private IEnumerator CompleteGame()
     {
-        // Aquí aparecerán créditos y luego volverá al menú principal
-        // TODO: Implementación pendiente
-        yield break;
+        if (transitioning) yield break;
+
+        yield return StartCoroutine(menuManager.RunCredits());
+
+        menuManager.GoToMainMenu();
     }
 
     // Wrapper que incrementa el contador, ejecuta la corutina y lo decrementa al terminar
@@ -281,10 +320,11 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayerFallAnimation()
+    private IEnumerator PlayerSlideAnimation()
     {
         transitioning = true;
-        yield return StartCoroutine(player.AnimateFall());
+        yield return StartCoroutine(player.AnimateSlide());
         transitioning = false;
     }
+
 }

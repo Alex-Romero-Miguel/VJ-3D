@@ -11,6 +11,8 @@ public class MapCreator : MonoBehaviour
 
     private GameObject mapRoot;
 
+    public Vector3 PlayerStartWorldPos { get; private set; }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -21,6 +23,13 @@ public class MapCreator : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private class ParsedTile
+    {
+        public int id;        // ID del prefab (1–n)
+        public int canal_id;   // variant opcional (0–n)
+        public string extra;  // text opcional ("L", "R", etc.)
     }
 
     public List<GameObject> CreateMap(TextAsset mapFile, Vector3 origin, Transform parent = null)
@@ -36,15 +45,18 @@ public class MapCreator : MonoBehaviour
             return null;
         }
 
-        char[] seps = { ' ', '\n', '\r' };
-        string[] snums = mapFile.text.Split(seps, StringSplitOptions.RemoveEmptyEntries);
+        char[] seps = { ' ', '\n', '\r', '\t' };
+        string[] tokens = mapFile.text.Split(seps, StringSplitOptions.RemoveEmptyEntries);
 
-        int[] nums = new int[snums.Length];
-        for (int i = 0; i < snums.Length; i++)
-            nums[i] = int.Parse(snums[i]);
+        if (tokens.Length < 2)
+        {
+            Debug.LogError("MapCreator: archivo no válido.");
+            return null;
+        }
 
-        int sizeX = nums[0];
-        int sizeZ = nums[1];
+        // Llegim les dimensions
+        int sizeX = int.Parse(tokens[0]);
+        int sizeZ = int.Parse(tokens[1]);
 
         // Crear raíz del mapa
         mapRoot = new GameObject("Map_" + mapFile.name);
@@ -57,27 +69,71 @@ public class MapCreator : MonoBehaviour
         {
             for (int x = 0; x < sizeX; x++)
             {
-                int tileId = nums[index++];
-
-                if (tileId == 0)
-                    continue; // espacio vacío
-
-                if (tileId < 1 || tileId > tileTypes.Length)
+                if (index >= tokens.Length)
                 {
-                    Debug.LogWarning($"MapCreator: tileId {tileId} fuera de rango.");
+                    Debug.LogWarning("Mapa incompleto o mal formateado.");
+                    break;
+                }
+
+                string token = tokens[index++];
+
+                if (token == "0")
+                    continue;
+
+                ParsedTile parsed = ParseToken(token);
+
+                if (parsed.id < 1 || parsed.id > tileTypes.Length)
+                {
+                    Debug.LogWarning($"ID {parsed.id} fuera de rango. Token: {token}");
                     continue;
                 }
 
-                GameObject prefab = tileTypes[tileId-1];
+                GameObject prefab = tileTypes[parsed.id - 1];
                 if (prefab == null) continue;
 
                 Vector3 pos = origin + new Vector3(x, 0f, sizeZminus1 - z);
-                GameObject tile = Instantiate(prefab, pos, Quaternion.identity);
-                tile.transform.parent = mapRoot.transform;
-                
+                GameObject tile = Instantiate(prefab, pos, Quaternion.identity, mapRoot.transform);
+
+                // Si el tile té configuració
+                ITileConfigurable cfg = tile.GetComponent<ITileConfigurable>();
+                if (cfg != null)
+                    cfg.Configure(parsed.canal_id, parsed.extra);
+
+                // si es un boton split
+                SplitButton splitBtn = tile.GetComponent<SplitButton>();
+                if (splitBtn != null)
+                {
+                    int[] p = Array.ConvertAll(parsed.extra.Split(','), int.Parse);
+
+                    //Vector3 localPosA = new Vector3(p[1], 0.1f, sizeZminus1 - p[0]);
+                    //Vector3 posA = mapRoot.transform.TransformPoint(localPosA);
+
+                    //Vector3 localPosB = new Vector3(p[3], 0.1f, sizeZminus1 - p[2]);
+                    //Vector3 posB = mapRoot.transform.TransformPoint(localPosB);
+
+                    Vector3 posA = origin + new Vector3(p[1], 0f, sizeZminus1 - p[0]);
+                    Vector3 posB = origin + new Vector3(p[3], 0f, sizeZminus1 - p[2]);
+
+                    splitBtn.SetSplitPositions(posA, posB);
+                }
+
+
                 spawnedTiles.Add(tile);
             }
         }
+
+
+        // Leer posicion inicial del jugador
+        PlayerStartWorldPos = new Vector3(5, 1f, sizeZminus1 - 10);
+        if (tokens.Length >= index + 2)
+        {
+            int pz = int.Parse(tokens[index++]); // fila (z en el mapa)
+            int px = int.Parse(tokens[index++]); // columna (x)
+
+            //Vector3 spawn = origin + new Vector3(px, 1f, sizeZminus1 - pz);
+            PlayerStartWorldPos = new Vector3(px, 1f, sizeZminus1 - pz);
+        }
+
         return spawnedTiles;
     }
 
@@ -101,5 +157,49 @@ public class MapCreator : MonoBehaviour
             var ta = t.GetComponent<TileAnimator>();
             if (ta != null) ta.StopAllCoroutines();
         }
+    }
+
+    private ParsedTile ParseToken(string token)
+    {
+        // Formats suportats:
+        // "3"
+        // "4:0"  puente
+        // "6:1:L" boton puente
+        // "7:2,1,3,1"  boton split
+
+        ParsedTile pt = new ParsedTile();
+
+        string[] p = token.Split(':');
+
+        pt.id = int.Parse(p[0]);
+        pt.canal_id = 0;
+        pt.extra = null;
+
+        //// Variant opcional
+        //if (p.Length > 1)
+        //    pt.canal_id = int.Parse(p[1]);
+
+        //// Extra opcional
+        //if (p.Length > 2)
+        //    pt.extra = p[2];
+
+        if (p.Length > 1)
+        {
+            bool isChannelNumber = int.TryParse(p[1], out int cId);
+
+            if (isChannelNumber)
+            {
+                pt.canal_id = cId;
+                if (p.Length > 2)
+                    pt.extra = pt.extra = p[2];
+            }
+            else
+            {
+                pt.extra = p[1];
+            }
+        }
+
+
+        return pt;
     }
 }

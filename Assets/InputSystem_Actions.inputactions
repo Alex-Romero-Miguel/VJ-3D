@@ -95,6 +95,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ChangeHalves",
+                    "type": "Button",
+                    "id": "9f227bf1-1730-4be2-9b55-b6a7b44b5723",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -601,6 +610,17 @@
                     "processors": "KeyToNumber(number=9)",
                     "groups": ";Keyboard&Mouse",
                     "action": "Go To Level",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "70c3bfe9-0974-4191-a55c-370a26b8d3ac",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ChangeHalves",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

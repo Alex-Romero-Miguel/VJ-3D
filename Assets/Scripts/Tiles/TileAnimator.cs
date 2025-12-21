@@ -64,4 +64,21 @@ public class TileAnimator : MonoBehaviour
         
         gameObject.SetActive(false);
     }
+
+    // Para tile Fragil
+    public IEnumerator AnimateBreak(float fallDuration = 0.2f)
+    {
+        float t = 0;
+        Vector3 start = transform.position;
+        Vector3 targetPos = start + Vector3.down * 5f; 
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / fallDuration;
+            transform.position = Vector3.Lerp(start, targetPos, t * t);
+            yield return null;
+        }
+
+        gameObject.SetActive(false);
+    }
 }
