@@ -381,6 +381,6 @@ public class MoveCube : MonoBehaviour
 
     public void SetInitPos(Vector3 pos)
     {
-        initPos = pos;
+        fullInitPos = pos;
     }
 }
