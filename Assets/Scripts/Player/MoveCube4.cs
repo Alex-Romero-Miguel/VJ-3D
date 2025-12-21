@@ -51,6 +51,8 @@ public class MoveCube : MonoBehaviour
     {
         RaycastHit hit;
         
+        Physics.SyncTransforms();
+        
         if (isStanding()) return Physics.Raycast(currentBox.bounds.center, Vector3.down, out hit, size.y, layerMask);
 
         Vector3 offset = Vector3.zero;
