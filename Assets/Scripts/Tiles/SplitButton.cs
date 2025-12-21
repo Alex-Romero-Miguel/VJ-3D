@@ -20,9 +20,7 @@ public class SplitButton : TileBase
         {
             isPressed = true;
 
-            player.Divide();
-
-            //player.Split(posA, posB);
+            player.Divide(posA, posB);
 
             Debug.DrawRay(posA, Vector3.up * 10f, Color.red, 20f);
             Debug.DrawRay(posB, Vector3.up * 10f, Color.blue, 20f);

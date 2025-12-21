@@ -105,12 +105,6 @@ public class MapCreator : MonoBehaviour
                 {
                     int[] p = Array.ConvertAll(parsed.extra.Split(','), int.Parse);
 
-                    //Vector3 localPosA = new Vector3(p[1], 0.1f, sizeZminus1 - p[0]);
-                    //Vector3 posA = mapRoot.transform.TransformPoint(localPosA);
-
-                    //Vector3 localPosB = new Vector3(p[3], 0.1f, sizeZminus1 - p[2]);
-                    //Vector3 posB = mapRoot.transform.TransformPoint(localPosB);
-
                     Vector3 posA = origin + new Vector3(p[1], 0f, sizeZminus1 - p[0]);
                     Vector3 posB = origin + new Vector3(p[3], 0f, sizeZminus1 - p[2]);
 

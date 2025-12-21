@@ -218,7 +218,7 @@ public class MoveCube : MonoBehaviour
                 Vector3 topHalfCenter = topHalfBox.bounds.center;
                 Vector3 bottomHalfCenter = bottomHalfBox.bounds.center;
 
-                if (Vector3.Distance(topHalfCenter, bottomHalfCenter) <= size.x)
+                if (!bMoving && Vector3.Distance(topHalfCenter, bottomHalfCenter) <= size.x)
                 {
                     Recombine();
                     return;
@@ -317,20 +317,24 @@ public class MoveCube : MonoBehaviour
         return bMoving;
     }
 
-    public void Divide()
+    public void Divide(Vector3 topHalfPos, Vector3 bottomHalfPos)
     {
         Debug.Log("Divided");
 
         divided = true;
+        bMoving = false;
+        bFalling = false;
 
         size = halfInitSize;
         halfSize = size/2.0f;
 
         topHalfTransform.rotation = topHalfInitRot;
         topHalfTransform.localPosition = topHalfInitPos;
+        topHalfTransform.position = topHalfPos;
 
         bottomHalfTransform.rotation = bottomHalfInitRot;
         bottomHalfTransform.localPosition = bottomHalfInitPos;
+        bottomHalfTransform.position = bottomHalfPos;
 
         currentTransform = topHalfTransform;
         currentBox = topHalfBox;
@@ -340,6 +344,8 @@ public class MoveCube : MonoBehaviour
     {
         Debug.Log("Recombine");
         divided = false;
+        bMoving = false;
+        bFalling = false;
 
         size = fullInitSize;
         halfSize = size/2.0f;
