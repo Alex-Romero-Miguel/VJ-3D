@@ -83,7 +83,7 @@ public class MoveCube : MonoBehaviour
             if (plus == minus) return;
             
             rotAxis = Vector3.forward;
-            rotDir = plus ? -1f : 1f;
+            rotDir = plus ? 1f : -1f;
 
             rotPoint = currentBox.bounds.center + new Vector3(0f, -halfSize.y, 0f);
 
@@ -220,7 +220,7 @@ public class MoveCube : MonoBehaviour
             prepareFallingRotation();
 
             bFalling = true;
-            fallSpeed = 7f;
+            fallSpeed = fallAcceleration;
             
             // Play sound associated to falling
             sfxSource.PlayOneShot(fallSound, 1.5f);
