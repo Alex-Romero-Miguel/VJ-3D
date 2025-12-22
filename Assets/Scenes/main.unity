@@ -4473,6 +4473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a088c3a08304c994db1bfa1eb0d2a4aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveCube
+  grid: 0.5
   rotSpeed: 240
   fallAcceleration: 7
   fallSound: {fileID: 8300000, guid: 6bdc6de39c0314b4eb1b1ab0e21ad992, type: 3}
