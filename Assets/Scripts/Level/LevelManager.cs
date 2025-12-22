@@ -103,13 +103,9 @@ public class LevelManager : MonoBehaviour
 
         yield return StartCoroutine(MapFallAnimation());
 
-        UnloadLevel();
-
         yield return new WaitForSeconds(levelAnimationDelay);
 
         if(transitioning) yield break;
-
-        LoadLevel(currentLevel);
 
         yield return StartCoroutine(MapRiseAnimation());
 
