@@ -121,6 +121,11 @@ public class MoveCube : MonoBehaviour
         return halfSize.x == halfSize.y;
     }
 
+    public bool isDivided()
+    {
+        return divided;
+    }
+
     private void Awake()
     {
         Transform[] transforms = GetComponentsInChildren<Transform>();
@@ -211,7 +216,7 @@ public class MoveCube : MonoBehaviour
                     Vector3 topHalfCenter = topHalfBox.bounds.center;
                     Vector3 bottomHalfCenter = bottomHalfBox.bounds.center;
 
-                    if (Vector3.Distance(topHalfCenter, bottomHalfCenter) <= size.x) Recombine();
+                    if (Vector3.Distance(topHalfCenter, bottomHalfCenter) <= 1.1f * size.x) Recombine();
                 }
             }
         }
@@ -330,6 +335,9 @@ public class MoveCube : MonoBehaviour
         size = halfInitSize;
         halfSize = size/2.0f;
 
+        topHalfBox.enabled = true;
+        bottomHalfBox.enabled = true;
+
         fullTransform.position = fullInitPos;
         fullTransform.rotation = fullInitRot;
 
@@ -367,6 +375,9 @@ public class MoveCube : MonoBehaviour
 
         currentTransform = fullTransform;
         currentBox = fullBox;
+        
+        topHalfBox.enabled = false;
+        bottomHalfBox.enabled = false;
     }
 
     public IEnumerator AnimateSlide(float duration = 0.8f)

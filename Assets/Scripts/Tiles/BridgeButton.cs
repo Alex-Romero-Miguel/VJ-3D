@@ -32,15 +32,12 @@ public class BridgeButton : TileBase, ITileConfigurable
 
     protected override void Activate(Collider other)
     {
-        MoveCube player = other.GetComponent<MoveCube>();
+        MoveCube player = other.GetComponentInParent<MoveCube>();
         if (player == null) return;
 
-        // Botón CRUZ
-        if (isStrictButton)
+        if (isStrictButton) // Botón Cruz
         {
-            //Debug.Log("cruz");
-
-            if (player.isStanding())
+            if (player.isStanding() && !player.isDivided())
                 PressButton();
         }
         else // Boton Rodondo
@@ -63,9 +60,6 @@ public class BridgeButton : TileBase, ITileConfigurable
 
     private void PressButton()
     {
-        // Animación visual del botón bajando
-        TileAnimator animator = GetComponent<TileAnimator>();
-
         // Activar todos los puentes conectados
         foreach (BridgeTile bridge in connectedBridges)
         {
