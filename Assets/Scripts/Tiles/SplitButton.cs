@@ -10,9 +10,9 @@ public class SplitButton : TileBase
 
     protected override void Activate(Collider other)
     {
-        MoveCube player = other.GetComponent<MoveCube>();
+        MoveCube player = other.GetComponentInParent<MoveCube>();
         if (player == null) return;
-        if (player.isStanding())
+        if (player.isStanding() && !player.isDivided())
         {
             player.Divide(posA, posB);
 
