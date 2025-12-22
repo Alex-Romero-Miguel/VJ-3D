@@ -27,4 +27,6 @@ public class GoalTile : TileBase
             //}
         }
     }
+
+    public override void Reset() {}
 }

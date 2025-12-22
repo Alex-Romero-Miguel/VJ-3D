@@ -15,7 +15,8 @@ public class BridgeTile : MonoBehaviour, ITileConfigurable
 
     private float rotationTime = 0.4f;
 
-    private bool isActive = false;
+    private bool startsActive = false;
+    private bool isActive;
 
     private Quaternion closedRot; // rotación sin abrir
     private Quaternion openRot; // rotación abierta
@@ -26,6 +27,7 @@ public class BridgeTile : MonoBehaviour, ITileConfigurable
         //closedRot = openRot * Quaternion.Euler(0, 0, -90);
 
         //InitializeState(false);
+        isActive = startsActive;
     }
 
     // Llamado por MapCreator
@@ -80,8 +82,8 @@ public class BridgeTile : MonoBehaviour, ITileConfigurable
     // Configura el estado inicial sin animación (para el Start del nivel)
     public void InitializeState(bool startActive)
     {
-        isActive = startActive;
-        hinge.localRotation = isActive ? openRot : closedRot;
+        startsActive = startActive;
+        Reset();
     }
 
     // Cambia el estado (de abierto a cerrado o viceversa)
@@ -106,5 +108,11 @@ public class BridgeTile : MonoBehaviour, ITileConfigurable
         }
 
         hinge.localRotation = targetRot;
+    }
+
+    public void Reset()
+    {
+        isActive = startsActive;
+        hinge.localRotation = isActive ? openRot : closedRot;
     }
 }

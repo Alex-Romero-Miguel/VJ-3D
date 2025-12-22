@@ -21,6 +21,8 @@ public class SplitButton : TileBase
         }
     }
 
+    public override void Reset() {}
+
     public void SetSplitPositions(Vector3 posA, Vector3 posB)
     {
         this.posA = posA;

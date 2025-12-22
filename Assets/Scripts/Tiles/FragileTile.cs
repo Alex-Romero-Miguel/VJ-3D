@@ -16,11 +16,18 @@ public class FragileTile : TileBase
 
             StartCoroutine(BreakSequence());
 
-            Debug.Log("break");
+            //Debug.Log("break");
 
             //StartCoroutine(LevelManager.Instance.RestartLevel());
         }
     }
+
+    public override void Reset()
+    {
+        broken = false;
+        //gameObject.SetActive(true);
+    }
+
     private IEnumerator BreakSequence()
     {
         broken = true;
