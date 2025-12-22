@@ -6,14 +6,13 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public class BridgeTile : MonoBehaviour, ITileConfigurable
 {
-    public Transform hinge;
     public int channelID;   // Asignado por MapCreator
-
+    public float rotationTime;
     public Direction hingeDirection;
 
     public enum Direction { Left, Right, Up, Down }
+    public Transform hinge;
 
-    private float rotationTime = 0.4f;
 
     private bool startsActive = false;
     private bool isActive;
