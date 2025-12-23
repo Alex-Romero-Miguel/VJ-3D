@@ -351,11 +351,15 @@ public class MoveCube : MonoBehaviour
 
         currentTransform = topHalfTransform;
         currentBox = topHalfBox;
+
+        fullBox.enabled = false;
     }
 
     public void Recombine()
     {
         divided = false;
+
+        fullBox.enabled = true;
 
         Vector3 aux = (topHalfBox.bounds.center + bottomHalfBox.bounds.center) / 2.0f;
         fullTransform.position = Snap(aux);
