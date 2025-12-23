@@ -129,7 +129,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3263826093607635539, guid: 41459d5c7d7485640af678335f992031, type: 3}
       propertyPath: m_text
-      value: Menu
+      value: Pause
       objectReference: {fileID: 0}
     - target: {fileID: 3263826093607635539, guid: 41459d5c7d7485640af678335f992031, type: 3}
       propertyPath: m_VerticalAlignment
