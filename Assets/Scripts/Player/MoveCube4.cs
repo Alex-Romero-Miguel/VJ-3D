@@ -13,6 +13,7 @@ using UnityEngine.Tilemaps;
 
 public class MoveCube : MonoBehaviour
 {
+    public float grid;
 	public float rotSpeed; 			        // Rotation speed in degrees per second
     public float fallAcceleration; 		    // Fall acceleration in the Y direction
     public AudioClip fallSound; 	        // Sound to play when the cube starts falling
@@ -51,6 +52,8 @@ public class MoveCube : MonoBehaviour
     {
         RaycastHit hit;
         
+        Physics.SyncTransforms();
+        
         if (isStanding()) return Physics.Raycast(currentBox.bounds.center, Vector3.down, out hit, size.y, layerMask);
 
         Vector3 offset = Vector3.zero;
@@ -80,7 +83,7 @@ public class MoveCube : MonoBehaviour
             if (plus == minus) return;
             
             rotAxis = Vector3.forward;
-            rotDir = plus ? -1f : 1f;
+            rotDir = plus ? 1f : -1f;
 
             rotPoint = currentBox.bounds.center + new Vector3(0f, -halfSize.y, 0f);
 
@@ -118,6 +121,11 @@ public class MoveCube : MonoBehaviour
         return halfSize.x == halfSize.y;
     }
 
+    public bool isDivided()
+    {
+        return divided;
+    }
+
     private void Awake()
     {
         Transform[] transforms = GetComponentsInChildren<Transform>();
@@ -130,13 +138,13 @@ public class MoveCube : MonoBehaviour
 
         topHalfTransform = transforms[1];
         topHalfInitPos = topHalfTransform.localPosition;
-        topHalfInitRot = topHalfTransform.rotation;
+        topHalfInitRot = topHalfTransform.localRotation;
         topHalfBox = topHalfTransform.GetComponent<BoxCollider>();
         halfInitSize = topHalfBox.bounds.size;
 
         bottomHalfTransform = transforms[3];
         bottomHalfInitPos = bottomHalfTransform.localPosition;
-        bottomHalfInitRot = bottomHalfTransform.rotation;
+        bottomHalfInitRot = bottomHalfTransform.localRotation;
         bottomHalfBox = bottomHalfTransform.GetComponent<BoxCollider>();
     }
 
@@ -152,11 +160,16 @@ public class MoveCube : MonoBehaviour
 
         levelManager = LevelManager.Instance;
 
+        fullBox.enabled = true;
+
         currentTransform = fullTransform;
         currentBox = fullBox;
 
         size = fullInitSize;
         halfSize = size/2.0f; 
+
+        topHalfBox.enabled = false;
+        bottomHalfBox.enabled = false;
     }
 
     // Update is called once per frame
@@ -170,7 +183,6 @@ public class MoveCube : MonoBehaviour
             {
                 float amount = 2f * rotSpeed * Time.deltaTime;
                 currentTransform.RotateAround(rotPoint, rotAxis, amount * rotDir);
-
                 rotRemainder -= amount;
             }
             else
@@ -189,15 +201,28 @@ public class MoveCube : MonoBehaviour
 			// If we are moving, we rotate around the line formed by rotPoint and rotAxis an angle depending on deltaTime
 			// If this angle is larger than the remainder, we stop the movement
             float amount = rotSpeed * Time.deltaTime;
-            if(amount > rotRemainder)
-            {
-                currentTransform.RotateAround(rotPoint, rotAxis, rotRemainder * rotDir);
-                bMoving = false;
-            }
-            else
+            if(amount <= rotRemainder)
             {
                 currentTransform.RotateAround(rotPoint, rotAxis, amount * rotDir);
                 rotRemainder -= amount;
+            }
+            else
+            {
+                currentTransform.RotateAround(rotPoint, rotAxis, rotRemainder * rotDir);
+                currentTransform.position = Snap(currentTransform.position);
+
+                rotRemainder = 0f;
+                bMoving = false;
+
+                if (divided)
+                {
+                    Physics.SyncTransforms();
+
+                    Vector3 topHalfCenter = topHalfBox.bounds.center;
+                    Vector3 bottomHalfCenter = bottomHalfBox.bounds.center;
+
+                    if (Vector3.Distance(topHalfCenter, bottomHalfCenter) <= 1.1f * size.x) Recombine();
+                }
             }
         }
         else if (!isGrounded())
@@ -205,25 +230,15 @@ public class MoveCube : MonoBehaviour
             prepareFallingRotation();
 
             bFalling = true;
-            fallSpeed = 7f;
+            fallSpeed = fallAcceleration;
             
             // Play sound associated to falling
-            //AudioSource.PlayClipAtPoint(fallSound, transform.position, 1.5f);
             sfxSource.PlayOneShot(fallSound, 1.5f);
         }
         else
         {
             if (divided)
             {
-                Vector3 topHalfCenter = topHalfBox.bounds.center;
-                Vector3 bottomHalfCenter = bottomHalfBox.bounds.center;
-
-                if (Vector3.Distance(topHalfCenter, bottomHalfCenter) <= size.x)
-                {
-                    Recombine();
-                    return;
-                }
-
                 if (changeHalvesAction.WasPressedThisFrame())
                     if (currentTransform == topHalfTransform) 
                     {
@@ -248,7 +263,6 @@ public class MoveCube : MonoBehaviour
 
                 // We play a random movemnt sound
                 int iSound = UnityEngine.Random.Range(0, moveSounds.Length);
-                //AudioSource.PlayClipAtPoint(moveSounds[iSound], transform.position, 1.0f);
                 sfxSource.PlayOneShot(moveSounds[iSound], 1.0f);
 
                 // Set rotDir, rotRemainder, rotPoint, and rotAxis according to the movement the player wants to make
@@ -295,10 +309,10 @@ public class MoveCube : MonoBehaviour
         fullTransform.rotation = fullInitRot;
         fullTransform.position = fullInitPos;
 
-        topHalfTransform.rotation = topHalfInitRot;
+        topHalfTransform.localRotation = topHalfInitRot;
         topHalfTransform.localPosition = topHalfInitPos;
 
-        bottomHalfTransform.rotation = bottomHalfInitRot;
+        bottomHalfTransform.localRotation = bottomHalfInitRot;
         bottomHalfTransform.localPosition = bottomHalfInitPos;
 
         currentTransform = fullTransform;
@@ -317,44 +331,65 @@ public class MoveCube : MonoBehaviour
         return bMoving;
     }
 
-    public void Divide()
+    public void Divide(Vector3 topHalfPos, Vector3 bottomHalfPos)
     {
-        Debug.Log("Divided");
-
         divided = true;
+        bMoving = false;
+        bFalling = false;
 
         size = halfInitSize;
         halfSize = size/2.0f;
 
+        topHalfBox.enabled = true;
+        bottomHalfBox.enabled = true;
+
+        fullTransform.position = fullInitPos;
+        fullTransform.rotation = fullInitRot;
+
         topHalfTransform.rotation = topHalfInitRot;
         topHalfTransform.localPosition = topHalfInitPos;
+        topHalfTransform.position = topHalfPos;
 
         bottomHalfTransform.rotation = bottomHalfInitRot;
         bottomHalfTransform.localPosition = bottomHalfInitPos;
+        bottomHalfTransform.position = bottomHalfPos;
 
         currentTransform = topHalfTransform;
         currentBox = topHalfBox;
+
+        fullBox.enabled = false;
     }
 
     public void Recombine()
     {
-        Debug.Log("Recombine");
         divided = false;
 
-        size = fullInitSize;
-        halfSize = size/2.0f;
+        fullBox.enabled = true;
 
-        topHalfTransform.rotation = topHalfInitRot;
+        Vector3 aux = (topHalfBox.bounds.center + bottomHalfBox.bounds.center) / 2.0f;
+        fullTransform.position = Snap(aux);
+
+        Vector3 dir = (topHalfBox.bounds.center - bottomHalfBox.bounds.center).normalized;
+        fullTransform.rotation = Quaternion.LookRotation(Vector3.up, dir);
+
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z)) size = new Vector3(fullInitSize.y, fullInitSize.x, fullInitSize.z);
+        else size = new Vector3(fullInitSize.x, fullInitSize.z, fullInitSize.y);
+        halfSize = size/2.0f;
+        
+        topHalfTransform.localRotation = topHalfInitRot;
         topHalfTransform.localPosition = topHalfInitPos;
 
-        bottomHalfTransform.rotation = bottomHalfInitRot;
+        bottomHalfTransform.localRotation = bottomHalfInitRot;
         bottomHalfTransform.localPosition = bottomHalfInitPos;
 
         currentTransform = fullTransform;
         currentBox = fullBox;
+        
+        topHalfBox.enabled = false;
+        bottomHalfBox.enabled = false;
     }
 
-    public IEnumerator AnimateSlide(float duration = 0.8f)
+    public IEnumerator AnimateSlide(float duration = 0.4f)
     {
         yield return new WaitUntil(() => !bMoving);
 
@@ -382,5 +417,25 @@ public class MoveCube : MonoBehaviour
     public void SetInitPos(Vector3 pos)
     {
         fullInitPos = pos;
+    }
+
+    private Vector3 Snap(Vector3 p) {
+        return new Vector3(
+            Mathf.Round(p.x / grid) * grid,
+            Mathf.Round(p.y / grid) * grid,
+            Mathf.Round(p.z / grid) * grid
+        );
+    }
+
+    public void ForceFall()
+    {
+        StartCoroutine(ForcedFall());
+    }
+
+    private IEnumerator ForcedFall()
+    {
+        yield return StartCoroutine(AnimateSlide());
+
+        LevelManager.Instance.Restart();
     }
 }

@@ -103,13 +103,11 @@ public class LevelManager : MonoBehaviour
 
         yield return StartCoroutine(MapFallAnimation());
 
-        UnloadLevel();
-
         yield return new WaitForSeconds(levelAnimationDelay);
 
         if(transitioning) yield break;
-
-        LoadLevel(currentLevel);
+        
+        RestartTiles();
 
         yield return StartCoroutine(MapRiseAnimation());
 
@@ -210,6 +208,15 @@ public class LevelManager : MonoBehaviour
         yield return StartCoroutine(menuManager.RunCredits());
 
         menuManager.GoToMainMenu();
+    }
+
+    private void RestartTiles()
+    {
+        foreach (var tile in tiles)
+        {
+            TileBase t = tile.GetComponent<TileBase>();
+            if (t != null) t.Reset();
+        }
     }
 
     // Wrapper que incrementa el contador, ejecuta la corutina y lo decrementa al terminar

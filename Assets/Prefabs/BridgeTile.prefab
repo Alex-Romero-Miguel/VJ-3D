@@ -58,9 +58,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7684a61a103bec445b0dcb72187146fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BridgeTile
-  hinge: {fileID: 6729679800663836258}
   channelID: 1
+  rotationTime: 0.4
   hingeDirection: 0
+  hinge: {fileID: 6729679800663836258}
+  startsActive: 0
 --- !u!1 &8354760568819403161
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,7 +130,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: bec1e48f2e624994f939a95151183da1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

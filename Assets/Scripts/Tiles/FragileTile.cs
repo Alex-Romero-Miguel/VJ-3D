@@ -8,19 +8,28 @@ public class FragileTile : TileBase
     {
         if (broken) return;
 
-        MoveCube cube = other.GetComponent<MoveCube>();
+        MoveCube cube = other.GetComponentInParent<MoveCube>();
 
-        if (cube != null && cube.isStanding())
+        if (cube != null && cube.isStanding() && !cube.isDivided())
         {
             broken = true;
 
             StartCoroutine(BreakSequence());
 
-            Debug.Log("break");
+            cube.ForceFall();
+
+            //Debug.Log("break");
 
             //StartCoroutine(LevelManager.Instance.RestartLevel());
         }
     }
+
+    public override void Reset()
+    {
+        broken = false;
+        //gameObject.SetActive(true);
+    }
+
     private IEnumerator BreakSequence()
     {
         broken = true;

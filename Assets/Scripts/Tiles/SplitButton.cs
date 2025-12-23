@@ -5,29 +5,23 @@ using UnityEngine;
 
 public class SplitButton : TileBase
 {
-    private bool isPressed = false;
-
     private Vector3 posA;
     private Vector3 posB;
 
     protected override void Activate(Collider other)
     {
-        if (isPressed) return;
-
-        MoveCube player = other.GetComponent<MoveCube>();
+        MoveCube player = other.GetComponentInParent<MoveCube>();
         if (player == null) return;
-        if (player.isStanding())
+        if (player.isStanding() && !player.isDivided())
         {
-            isPressed = true;
-
-            player.Divide();
-
-            //player.Split(posA, posB);
+            player.Divide(posA, posB);
 
             Debug.DrawRay(posA, Vector3.up * 10f, Color.red, 20f);
             Debug.DrawRay(posB, Vector3.up * 10f, Color.blue, 20f);
         }
     }
+
+    public override void Reset() {}
 
     public void SetSplitPositions(Vector3 posA, Vector3 posB)
     {

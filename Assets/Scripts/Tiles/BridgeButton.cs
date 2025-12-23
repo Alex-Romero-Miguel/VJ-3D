@@ -3,14 +3,13 @@ using System.Collections.Generic;
 
 public class BridgeButton : TileBase, ITileConfigurable
 {
-    // Marca esto como TRUE solo en el prefab del botón Cruz (Strict)
+    // Marca esto como TRUE solo en el prefab del botÃ³n Cruz (Strict)
     public bool isStrictButton;
 
     public int channelID; // Asignado por MapCreator
-    private bool isPressed = false;
     private List<BridgeTile> connectedBridges = new List<BridgeTile>();
 
-    // Esta función la llama MapCreator al crear el mapa
+    // Esta funciÃ³n la llama MapCreator al crear el mapa
     public void Configure(int id, string extra)
     {
         this.channelID = id;
@@ -28,20 +27,17 @@ public class BridgeButton : TileBase, ITileConfigurable
 
             }
         }
-        //Debug.Log($"Botón ID {channelID} encontró {connectedBridges.Count} puentes.");
+        //Debug.Log($"BotÃ³n ID {channelID} encontrÃ³ {connectedBridges.Count} puentes.");
     }
 
     protected override void Activate(Collider other)
     {
-        MoveCube player = other.GetComponent<MoveCube>();
+        MoveCube player = other.GetComponentInParent<MoveCube>();
         if (player == null) return;
 
-        // Botón CRUZ
-        if (isStrictButton)
+        if (isStrictButton) // BotÃ³n Cruz
         {
-            //Debug.Log("cruz");
-
-            if (player.isStanding())
+            if (player.isStanding() && !player.isDivided())
                 PressButton();
         }
         else // Boton Rodondo
@@ -50,13 +46,20 @@ public class BridgeButton : TileBase, ITileConfigurable
         }
     }
 
+    public override void Reset()
+    {
+        foreach (BridgeTile bridge in connectedBridges)
+        {
+            if (bridge != null)
+            {
+                bridge.Reset();
+                //Debug.Log("reset");
+            }
+        }
+    }
+
     private void PressButton()
     {
-        isPressed = true;
-
-        // Animación visual del botón bajando
-        TileAnimator animator = GetComponent<TileAnimator>();
-
         // Activar todos los puentes conectados
         foreach (BridgeTile bridge in connectedBridges)
         {
@@ -68,7 +71,7 @@ public class BridgeButton : TileBase, ITileConfigurable
         }
     }
 
-    // Dibuja una línea en el editor para ver a qué puentes está conectado
+    // Dibuja una lÃ­nea en el editor para ver a quÃ© puentes estÃ¡ conectado
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
