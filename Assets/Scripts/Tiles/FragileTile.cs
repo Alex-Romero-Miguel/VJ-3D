@@ -16,6 +16,8 @@ public class FragileTile : TileBase
 
             StartCoroutine(BreakSequence());
 
+            cube.ForceFall();
+
             //Debug.Log("break");
 
             //StartCoroutine(LevelManager.Instance.RestartLevel());

@@ -384,7 +384,7 @@ public class MoveCube : MonoBehaviour
         bottomHalfBox.enabled = false;
     }
 
-    public IEnumerator AnimateSlide(float duration = 0.8f)
+    public IEnumerator AnimateSlide(float duration = 0.4f)
     {
         yield return new WaitUntil(() => !bMoving);
 
@@ -420,5 +420,17 @@ public class MoveCube : MonoBehaviour
             Mathf.Round(p.y / grid) * grid,
             Mathf.Round(p.z / grid) * grid
         );
+    }
+
+    public void ForceFall()
+    {
+        StartCoroutine(ForcedFall());
+    }
+
+    private IEnumerator ForcedFall()
+    {
+        yield return StartCoroutine(AnimateSlide());
+
+        LevelManager.Instance.Restart();
     }
 }
