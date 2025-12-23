@@ -58,9 +58,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7684a61a103bec445b0dcb72187146fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BridgeTile
-  hinge: {fileID: 6729679800663836258}
   channelID: 1
+  rotationTime: 0.4
   hingeDirection: 0
+  hinge: {fileID: 6729679800663836258}
 --- !u!1 &8354760568819403161
 GameObject:
   m_ObjectHideFlags: 0
