@@ -94,7 +94,7 @@ public class MapCreator : MonoBehaviour
                 Vector3 pos = origin + new Vector3(x, 0f, sizeZminus1 - z);
                 GameObject tile = Instantiate(prefab, pos, Quaternion.identity, mapRoot.transform);
 
-                // Si el tile té configuració
+                // Si el tile té configuració (BridgeButton/BridgeTile)
                 ITileConfigurable cfg = tile.GetComponent<ITileConfigurable>();
                 if (cfg != null)
                     cfg.Configure(parsed.canal_id, parsed.extra);
@@ -184,12 +184,13 @@ public class MapCreator : MonoBehaviour
             if (isChannelNumber)
             {
                 pt.canal_id = cId;
+
                 if (p.Length > 2)
-                    pt.extra = pt.extra = p[2];
+                    pt.extra = string.Join(":", p, 2, p.Length - 2);
             }
             else
             {
-                pt.extra = p[1];
+                pt.extra = string.Join(":", p, 1, p.Length - 1);
             }
         }
 
