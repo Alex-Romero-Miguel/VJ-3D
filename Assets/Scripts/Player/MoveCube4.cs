@@ -160,11 +160,16 @@ public class MoveCube : MonoBehaviour
 
         levelManager = LevelManager.Instance;
 
+        fullBox.enabled = true;
+
         currentTransform = fullTransform;
         currentBox = fullBox;
 
         size = fullInitSize;
         halfSize = size/2.0f; 
+
+        topHalfBox.enabled = false;
+        bottomHalfBox.enabled = false;
     }
 
     // Update is called once per frame
